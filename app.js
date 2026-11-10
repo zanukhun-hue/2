@@ -154,6 +154,7 @@
   function drawStage() {
     var frame = $("#compositionFrame"), root = $("#stageLayers");
     if (!frame || !root) return;
+    refreshViewer();
     var w = frame.clientWidth || 800, h = frame.clientHeight || 450;
     var layers = currentLayers();
     var onlySolo = layers.some(function(l){return l.solo && l.visible;});
@@ -703,12 +704,12 @@
     });
     $("#compositionFrame").addEventListener("pointerdown",function(e){
       var node=e.target.closest("[data-layer-id]");
-      if(!node){if(state.tool!=="hand")chooseLayer(null);return;}
       if(state.tool==="hand"){
         dragging={hand:true,clientX:e.clientX,clientY:e.clientY,x:state.panX,y:state.panY};
         $("#compositionFrame").setPointerCapture(e.pointerId);
         return;
       }
+      if(!node){chooseLayer(null);return;}
       var l=currentLayers().find(function(x){return x.id===node.dataset.layerId;});if(!l)return;
       chooseLayer(l.id);
       if(l.locked)return;
