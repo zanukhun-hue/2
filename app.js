@@ -10,7 +10,7 @@ function $(s,root){return (root||document).querySelector(s);}
 function $$(s,root){return Array.from((root||document).querySelectorAll(s));}
 function el(tag,cls,value){var n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=String(value);return n;}
 function set(s,value){var n=$(s);if(n)n.textContent=String(value==null?"":value);}
-function media(u){return typeof u==="string"&&/^(https:\/\/|\.\/|assets\/|media\/)/i.test(u)&&!/[<>"\u0000-\u001f]/.test(u);}
+function media(u){return typeof u==="string"&&/^(https:\/\/|\.\/|assets\/|media\/)/i.test(u)&&!/[<>"\u0000-\u001f]/.test(u)&& !(window.NULL_OBJECT_MEDIA_READY===false && /^assets\/(?!.*-fallback\.svg$)/.test(u));}
 function ext(u){return typeof u==="string"&&/^https:\/\//i.test(u);}
 function fmt(t){var total=Math.floor(Math.max(t,0)*fps);return "00:00:"+String(Math.floor(total/fps)).padStart(2,"0")+":"+String(total%fps).padStart(2,"0");}
 function notice(message){var n=$("#toast");n.textContent=message;n.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(function(){n.classList.remove("show");},2700);}
@@ -27,9 +27,10 @@ function applyContent(){
   set("#heroSubtitle",data.tagline||"A PERSONAL WORLD BUILT FRAME BY FRAME.");
   set("#cassetteBrand",data.cassetteLabel||brand+" — THE COLLECTION");
   set("#audioTrackName",data.audioTitle||"YOUR_AUDIO_TRACK.mp3");
-  if(media(data.artwork)){
+  var cover=media(data.artwork)?data.artwork:"assets/hero-fallback.svg";
+  if(cover){
     var art=el("div","hero-artwork");
-    art.style.backgroundImage="linear-gradient(#100c17aa,#100c17aa),url("+JSON.stringify(data.artwork)+")";
+    art.style.backgroundImage="linear-gradient(#100c17aa,#100c17aa),url("+JSON.stringify(cover)+")";
     $("#stage-home").prepend(art);
   }
   if(media(data.audioPreview)){
@@ -49,10 +50,10 @@ function applyContent(){
   var tags=$(".about-tags");tags.replaceChildren();
   var tagList=Array.isArray(data.aboutTags)&&data.aboutTags.length?data.aboutTags:["CREATOR","MOTION","EDITOR"];
   tagList.slice(0,5).forEach(function(item){tags.append(el("span","",String(item).slice(0,24)));});
-  if(media(data.profilePhoto)){
-    var img=el("img");img.src=data.profilePhoto;img.alt="Creator profile photo";img.loading="lazy";
-    $(".fake-photo").replaceWith(img);
-  }
+  var portrait=media(data.profilePhoto)?data.profilePhoto:"assets/logo-fallback.svg";
+  var img=el("img");img.src=portrait;img.alt="Null Object creator logo";img.loading="lazy";
+  img.onerror=function(){if(!img.src.endsWith("/logo-fallback.svg"))img.src="assets/logo-fallback.svg";};
+  $(".fake-photo").replaceWith(img);
   drawWork();drawLinks();markAssets();
 }
 function markAssets(){
