@@ -1,80 +1,72 @@
-# YOUR NAME — AE-inspired portfolio
+# NULL OBJECT — AE-inspired personal website
 
-A **personal website**, styled as a compositing application's workspace and inspired by Camiedrip.com's presentation. **It is not After Effects, and you cannot edit video in it.** The app chrome, Project tree, Effects panel, tape deck and timeline are visual metaphors. Clicking items navigates the site.
+Website for **Null Object** — AE plugins, motion design and edits. Inspired by Camiedrip.com's software-workspace presentation, but with original content and branding. It is a **website**, not a browser video editor.
 
-> The reference website was not accessible to the site-inspection tool during this revision. This is a close stylistic reinterpretation based on the previously observed layout (AE interface, cassette preview, timeline), **not a verified pixel-for-pixel reproduction**.
+## What is done
 
-## What visitors see
+- The name, biography and Telegram channel are configured in [site-config.js](site-config.js).
+- Home: animated cassette, NULL OBJECT branding, neon generated cover art and 35-second audio preview.
+- About: the uploaded cube mascot/avatar and a short Russian description.
+- My Work: three provided edits with their thumbnail images; click a work card to play the video.
+- Socials: active Telegram, GitHub and original website links. Discord/TikTok/YouTube remain empty until their real URLs are provided.
+- Project panel and timeline serve as navigation between the site's four sections.
+- Keyboard shortcuts: **1–4** navigate, **Space** previews audio/animation, **Esc** closes a video.
 
-- **01_HOME** — large personal title, animated cassette, optional cover art, visual/audio preview.
-- **02_ABOUT** — portrait photo, introduction, three small category tags.
-- **03_MY_WORK** — three video previews with thumbnails. Click a card to open a video.
-- **04_SOCIALS** — your Discord, TikTok, YouTube, Telegram, Instagram and personal website.
-- **Project panel** and **timeline** — alternate navigation for those four sections.
-- The tape deck works visually even before you supply an MP3; the page explicitly says there is **no audio attached**.
-- The site works on desktop and has a compact mobile layout.
+## Important: upload the media archive once
 
-## What you need to send me to replace the placeholders
+The source repo contains the website code and vector image fallbacks. This chat's GitHub connector cannot directly upload large binary media. The **complete media archive is prepared** separately, ready for a single drag-and-drop upload:
 
-| Material | Needed | Recommended format / details | Where it appears |
-| --- | --- | --- | --- |
-| **Display name / nickname** | Yes | Exact spelling and case | Hero, app header and cassette |
-| **Short tagline** | Yes | One short sentence, ideally up to 70 characters | Hero |
-| **About text** | Yes | 2–5 sentences about yourself | About composition |
-| **Portrait photo or avatar** | Yes | JPG/PNG/WEBP; ideally 1080 × 1350 or larger, portrait | About composition |
-| **Cover image / artwork** | Optional | JPG/WEBP, at least 1600 × 900; optional dark/transparent design | Behind the cassette |
-| **Audio preview** | Optional | MP3, ideally 20–35 seconds, content you may legally share | Cassette preview |
-| **Main edit #1** | Yes for full showcase | MP4 H.264, or an accessible direct MP4 URL | Work card #1 |
-| **Main edit #2** | Optional | MP4 H.264 | Work card #2 |
-| **Main edit #3** | Optional | MP4 H.264 | Work card #3 |
-| **Thumbnails** | Recommended | 3 JPG/PNG/WEBP images, ideally 1080 × 1350; one for each edit | Video cards |
-| **Project titles** | Recommended | One title per edit | Video cards |
-| **Social URLs** | Yes | Discord invite, TikTok, YouTube, Telegram, Instagram, personal site (whichever you actually use) | Socials composition |
+**File to upload:** \`null-object-assets.zip\` (about 15.3 MB).
 
-*You do not have to send everything at once.* Leave missing entries blank to keep the placeholders.
+To finish making the site fully functional:
+1. Download **null-object-assets.zip** from this conversation.
+2. Open [github.com/zanukhun-hue/2](https://github.com/zanukhun-hue/2).
+3. Choose **Add file → Upload files**.
+4. Drag in the ZIP **as-is, without unpacking**, at the root of the repository.
+5. Select **Commit changes** to \`main\`. The GitHub Pages deployment workflow detects the ZIP, extracts its \`assets/\` folder and sets the site's media-ready flag automatically.
 
-For each video, the site currently expects an actual browser-playable **MP4** file or direct URL. A standard YouTube watch link is **not** a direct MP4 and needs a separate embed integration.
+**Do not rename the ZIP**. When it is absent, the site displays branded placeholders instead of broken images or video players. After upload, all media should be visible on the next successful Pages deployment.
 
-### How to add your own content
+### Media in the archive
 
-All editable text, links, and media paths are in **[site-config.js](site-config.js)**. No other code changes are necessary for standard replacements.
+| Path inside archive | Source |
+|---|---|
+| \`assets/null-object-cover.png\` | Generated wide neon banner based on the avatar |
+| \`assets/null-object-avatar.png\` | User-provided original avatar |
+| \`assets/audio-preview.mp3\` | First 35 seconds of Chyde — Broken and Cold; default on cassette |
+| \`assets/audio-bratata-preview.mp3\` | Alternate preview from SELFISH — братата |
+| \`assets/audio-favorit-preview.mp3\` | Alternate preview from LOVELLACE — FAVORIT |
+| \`assets/work01.mp4\` | Optimized version of пе123ригоса.mp4 |
+| \`assets/work02.mp4\` | Optimized version of CC_Lelouch_final_1080p_apo8(1).mp4 |
+| \`assets/work03.mp4\` | Optimized version of шашлыыык 2_prob3.mp4 |
+| \`assets/work01_poster.jpg\` | Thumbnail frame from edit 1 |
+| \`assets/work02_poster.jpg\` | Thumbnail frame from edit 2 |
+| \`assets/work03_poster.jpg\` | Thumbnail frame from edit 3 |
 
-For example:
-~~~js
-brand: "MY NICK",
-tagline: "VIDEO EDITOR / MOTION ARTIST",
-profilePhoto: "assets/profile.webp",
-artwork: "assets/cover.webp",
-audioPreview: "assets/preview.mp3",
-projects: [
-  { title:"MY BEST EDIT", label:"EDIT_01.mp4", video:"assets/edit-01.mp4", poster:"assets/thumb-01.webp" },
-  { title:"SECOND EDIT", label:"EDIT_02.mp4", video:"assets/edit-02.mp4", poster:"assets/thumb-02.webp" },
-  { title:"THIRD EDIT", label:"EDIT_03.mp4", video:"assets/edit-03.mp4", poster:"assets/thumb-03.webp" }
-],
-socialLinks: [
-  { title:"DISCORD", url:"https://discord.gg/YOUR_INVITE" },
-  { title:"TIKTOK", url:"https://www.tiktok.com/@YOUR_HANDLE" }
-]
-~~~
+The original high-resolution videos are not committed; lighter MP4 versions are used for fast loading. These may contain third-party copyrighted music/footage. **Only publish media you have the rights to share publicly**.
 
-Put actual image/audio/video files inside an \`assets/\` directory; the relative URL should match the filename and case exactly. If a user does not have an artwork image, the cassette still displays a designed gradient background.
+## Configure GitHub Pages
 
-**Media hosting:** GitHub warns on files over 50 MB, and blocks normal uploads of files over 100 MB. Keep MP4s compressed (ideally under 25–50 MB) or host them separately with direct playback URLs. Don't commit private files or secret keys to a public GitHub repository.
+Go to **Settings → Pages → Build and deployment**, choose **GitHub Actions** as the source. The included workflow [pages.yml](.github/workflows/pages.yml) deploys automatically on updates to \`main\`. After a successful deployment, the expected address is:
 
-### Run and publish
+**https://zanukhun-hue.github.io/2/**
 
-Local: open \`index.html\` in a browser or serve the project with a simple static server. No npm or build steps required.
+This URL is not guaranteed active until GitHub Pages completes deployment successfully.
 
-GitHub Pages:
-1. Open **Settings → Pages** in the \`zanukhun-hue/2\` repository.
-2. Under Build and deployment, choose **GitHub Actions** as Source.
-3. The included workflow \`.github/workflows/pages.yml\` validates JS and deploys the site on pushes to \`main\`.
-4. After GitHub Pages confirms a successful deployment, the expected address is \`https://zanukhun-hue.github.io/2/\`.
+## Change content
 
-### Keyboard
+Edit [site-config.js](site-config.js). To add socials, fill in the URL of the currently empty Discord, TikTok or YouTube entry. To change songs, set \`audioPreview\` to one of the provided preview paths above. Do not commit credentials or bot tokens.
 
-\`1\` Home, \`2\` About, \`3\` Work, \`4\` Socials, \`Space\` toggle cassette preview, \`Esc\` close the video dialog. No editing controls.
+## Project structure
 
-### Credits
+- \`index.html\` — markup for the portfolio and AE-style frame
+- \`styles.css\` — styling / animations
+- \`app.js\` — website navigation, cassette and video previews
+- \`site-config.js\` — owner info and URLs
+- \`media-status.js\` — default placeholder state; overridden by the deployment
+- \`assets/logo-fallback.svg\` & \`assets/hero-fallback.svg\` — vector graphics used before media upload
+- \`null-object-assets.zip\` — uploaded separately, compiled by Pages when present
 
-Original website implementation. Inspired by the look of motion-design editing software and the layout of the referenced creator microsite. Not affiliated with Adobe. No reference photos, music, videos or branding have been copied.
+## Attribution
+
+Original website code; software UI visual inspiration only. Not affiliated with Adobe. No third-party reference-site artwork or audio is included.
