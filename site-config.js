@@ -1,44 +1,51 @@
-/*
- * PUBLIC PORTFOLIO CONTENT — REPLACE THESE PLACEHOLDERS.
- * Nothing in this file is private. Never put passwords, tokens, or keys here.
- *
- * Media paths are relative to the website root, for example:
- *   artwork: "assets/cover.webp"
- *   profilePhoto: "assets/profile.jpg"
- *   audioPreview: "assets/preview.mp3"
- *   projects[0].video: "assets/edit-01.mp4"
- *
- * You can also use full https:// links. Empty values display placeholders.
+/* NULL OBJECT — public portfolio settings.
+ * Media is supplied by the uploaded null-object-assets.zip in the project root.
+ * GitHub Pages will extract that archive into /assets during deployment.
+ * Leave unknown social URLs empty; do not put secrets here.
  */
 window.PORTFOLIO = {
-  brand: "YOUR NAME",
-  handle: "@YOUR_HANDLE",
-  kicker: "CREATIVE PORTFOLIO / 2026",
-  tagline: "A PERSONAL WORLD BUILT FRAME BY FRAME.",
-  cassetteLabel: "YOUR NAME — THE COLLECTION",
-  audioTitle: "YOUR_AUDIO_TRACK.mp3",
-  artwork: "",
-  audioPreview: "",
+  brand: "NULL OBJECT",
+  handle: "@ae_plugins_vault",
+  kicker: "AFTER EFFECTS / PLUGINS / CREATIVE WORK",
+  tagline: "AE PLUGINS, EDITS & MOTION DESIGN.",
+  cassetteLabel: "NULL OBJECT — CREATIVE ARCHIVE",
+  audioTitle: "CHYDE — BROKEN AND COLD / PREVIEW",
+  artwork: "assets/null-object-cover.png",
+  audioPreview: "assets/audio-preview.mp3",
 
-  aboutLine1: "MADE OF",
-  aboutLine2: "IDEAS.",
-  aboutText: "Write a short introduction about yourself here. What do you make, why do you create, and what do you want people to know?",
-  profilePhoto: "",
-  aboutTags: ["CREATOR", "MOTION", "EDITOR"],
+  aboutLine1: "NULL",
+  aboutLine2: "OBJECT.",
+  aboutText: "Null Object — проект про плагины Adobe After Effects, эдиты и моушн-дизайн. Делюсь инструментами, эффектами и визуальными экспериментами для монтажа и творчества.",
+  profilePhoto: "assets/null-object-avatar.png",
+  aboutTags: ["AE PLUGINS", "EDITS", "MOTION DESIGN"],
 
   projects: [
-    { title: "PROJECT 01", label: "VIDEO_01.mp4", video: "", poster: "" },
-    { title: "PROJECT 02", label: "VIDEO_02.mp4", video: "", poster: "" },
-    { title: "PROJECT 03", label: "VIDEO_03.mp4", video: "", poster: "" }
+    {
+      title: "EDIT / 001",
+      label: "пе123ригоса.mp4",
+      video: "assets/work01.mp4",
+      poster: "assets/work01_poster.jpg"
+    },
+    {
+      title: "EDIT / 002",
+      label: "CC_Lelouch_final_1080p_apo8(1).mp4",
+      video: "assets/work02.mp4",
+      poster: "assets/work02_poster.jpg"
+    },
+    {
+      title: "EDIT / 003",
+      label: "шашлыыык 2_prob3.mp4",
+      video: "assets/work03.mp4",
+      poster: "assets/work03_poster.jpg"
+    }
   ],
 
-  // Use full URLs. Empty strings intentionally show "ADD LINK" on the site.
   socialLinks: [
+    { title: "TELEGRAM CHANNEL", url: "https://t.me/ae_plugins_vault" },
     { title: "DISCORD", url: "" },
     { title: "TIKTOK", url: "" },
     { title: "YOUTUBE", url: "" },
-    { title: "TELEGRAM", url: "" },
-    { title: "INSTAGRAM", url: "" },
-    { title: "PERSONAL SITE", url: "" }
+    { title: "GITHUB", url: "https://github.com/zanukhun-hue" },
+    { title: "MAIN SITE", url: "https://null-object-ae.onrender.com" }
   ]
 };
