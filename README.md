@@ -4,10 +4,11 @@ An unofficial, interactive After Effects–inspired portfolio microsite. Inspire
 
 ## Live preview
 
-Publish with GitHub Pages: **Settings → Pages → Deploy from a branch → main / (root)**.
+Publish with GitHub Pages: open **Settings → Pages → Build and deployment → Source → GitHub Actions**. The committed workflow deploys the site on pushes to `main`. After the first successful deployment, the expected URL is `https://zanukhun-hue.github.io/2/` (the URL is not confirmed live until GitHub Pages reports success).
 
 ## Features
 - Docked Project / Composition / Properties / Timeline panels, with drag-resizable sidebars and timeline.
+- Composition zoom and pan tools, framing guides, and editable effects.
 - Editable visual layers; text, solids, and shapes. Drag objects in the canvas.
 - Timeline playback, scrubbing, keyframe creation and interpolation, layer selection, show/hide/lock/solo, reorder via drag and drop.
 - Import images into a composition; export/import projects as JSON.
