@@ -34,7 +34,9 @@ jobs:
           if [ -f null-object-assets.zip ]; then
             echo "Found optional user media bundle."
             unzip -oq null-object-assets.zip 'assets/*' -d _site
+            echo 'window.NULL_OBJECT_MEDIA_READY = true;' > _site/media-status.js
           else
+            cp media-status.js _site/
             echo "No media bundle uploaded yet; showing SVG and visual placeholders."
           fi
           find _site -maxdepth 2 -type f -printf '%p\n'
