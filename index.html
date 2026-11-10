@@ -1,150 +1,204 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#17171b">
-  <meta name="description" content="An interactive compositing-inspired portfolio and creative workspace.">
-  <title>AE WORKSPACE — Creative Studio</title>
-  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#1d1d22">
+  <meta name="description" content="A cinematic personal portfolio presented as a motion-design workspace.">
+  <title>YOUR NAME — CREATIVE WORKSPACE</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles.css">
   <script src="site-config.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
-<div class="shell">
-  <header class="window-bar">
-    <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
-    <span class="window-app"><span class="app-square">Ae</span> AFTER EFFECTS <span class="window-dim">— CREATOR WORKSPACE</span></span>
-    <div class="window-right"><span class="live-dot"></span><span>INTERACTIVE WEB EXPERIENCE</span><button type="button" class="window-action" id="openAboutTop" title="About the creator">↗</button></div>
+<div class="experience" id="experience">
+  <header class="app-titlebar">
+    <span class="traffic-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="application-icon">Ae</span>
+    <span class="app-name">Adobe After Effects <span class="muted">— Portfolio_2026.aep</span></span>
+    <span class="app-title-center" id="topProjectTitle">YOUR NAME / PERSONAL PROJECT</span>
+    <span class="titlebar-right"><span class="status-led"></span> PORTFOLIO MODE <span class="version-tag">V 1.0</span></span>
   </header>
-  <nav class="menu-bar" aria-label="Main menu">
-    <div class="menu-items" id="menuItems">
-      <button class="app-menu" data-menu="file">File</button><button class="app-menu" data-menu="edit">Edit</button>
-      <button class="app-menu" data-menu="composition">Composition</button><button class="app-menu" data-menu="layer">Layer</button>
-      <button class="app-menu" data-menu="effect">Effect</button><button class="app-menu" data-menu="animation">Animation</button>
-      <button class="app-menu" data-menu="view">View</button><button class="app-menu" data-menu="window">Window</button>
-      <button class="app-menu" data-menu="help">Help</button>
+
+  <div class="app-menubar">
+    <div class="app-menus" id="appMenus">
+      <button class="menu-btn" data-menu="file">File</button>
+      <button class="menu-btn" data-menu="edit">Edit</button>
+      <button class="menu-btn" data-menu="composition">Composition</button>
+      <button class="menu-btn" data-menu="layer">Layer</button>
+      <button class="menu-btn" data-menu="effect">Effect</button>
+      <button class="menu-btn" data-menu="view">View</button>
+      <button class="menu-btn" data-menu="window">Window</button>
+      <button class="menu-btn" data-menu="help">Help</button>
     </div>
-    <div class="menu-right"><span class="small-label">PROJECT:</span> <strong id="projectTitleMini">UNTITLED_01.aep</strong> <span class="saved-indicator" id="saveState">● AUTOSAVED</span></div>
-    <div class="menu-popover hidden" id="menuPopover" role="menu"></div>
-  </nav>
-  <div class="tools-bar">
-    <div class="tool-group">
-      <button class="tool-button active" id="selectTool" title="Selection tool (V)"><span class="cursor-glyph">⌁</span></button>
-      <button class="tool-button" id="handTool" title="Hand tool (H)">✋</button>
-      <button class="tool-button" id="textTool" title="New text layer (T)">T</button>
-      <button class="tool-button" id="shapeTool" title="New shape layer (S)">▭</button>
-      <span class="tool-separator"></span>
-      <button class="tool-button" id="importButton" title="Import image (Ctrl + I)">⇧</button>
-      <button class="tool-button" id="addSolidButton" title="New solid">▣</button>
-      <button class="tool-button" id="saveButton" title="Export project JSON (Ctrl + S)">▤</button>
-    </div>
-    <div class="top-center"><span class="small-label">WORKSPACE</span><button class="workspace-button selected">Standard <span>⌄</span></button><button class="workspace-button" id="resetWorkspace" title="Reset layout">↺</button></div>
-    <button class="top-cta" id="topSocials"><span class="social-indicator"></span> FIND ME ONLINE <span>↗</span></button>
+    <div class="workspace-label">Workspace: <b>Standard</b> <span>⌄</span></div>
+    <div class="menu-dropdown hidden" id="menuDropdown"></div>
   </div>
-  <div class="studio" id="studio">
-    <section class="panel project-panel" aria-label="Project and effects panel">
-      <div class="panel-tabs"><button class="tab active" data-left-tab="project">Project</button><button class="tab" data-left-tab="effects">Effects & Presets</button><div class="panel-tab-more">⋮</div></div>
-      <div class="panel-view" id="projectPane">
-        <div class="project-meta">
-          <div class="project-icon">Ae</div><div><b id="projectName">CREATOR_SPACE</b><small>1920 × 1080 • 24.00 fps<br>16 bpc • RGB</small></div>
-        </div>
-        <div class="panel-section-heading"><span>PROJECT</span><div><button class="tiny-button" id="newCompButton" title="New composition">＋</button><button class="tiny-button" id="newFolderButton" title="Import image">⇧</button></div></div>
-        <div class="project-tree" id="projectTree">
-          <button class="project-item current" data-comp="intro"><span class="item-icon comp">◩</span><span>01 / INTRO_SEQUENCE</span><small>00:12</small></button>
-          <button class="project-item" data-comp="social"><span class="item-icon comp">◩</span><span>02 / ABOUT_CREATOR</span><small>00:12</small></button>
-          <button class="project-item" data-comp="showreel"><span class="item-icon comp">◩</span><span>03 / SHOWREEL</span><small>00:12</small></button>
-        </div>
-        <div class="project-assets"><div class="assets-head"><span>IMPORTS</span><span id="assetCount">0 ITEMS</span></div><div id="assetList" class="asset-list"><div class="empty-assets">Drag a JPG or PNG here<br>or click <button id="importInline">Import File</button></div></div></div>
+
+  <div class="app-toolbar">
+    <div class="toolkit-left">
+      <span class="tool-cursor" aria-hidden="true">⌁</span>
+      <span class="toolbar-button" aria-hidden="true">✥</span>
+      <span class="toolbar-button" aria-hidden="true">⌕</span>
+      <span class="toolbar-divider"></span>
+      <span class="toolbar-button" aria-hidden="true">◇</span>
+      <span class="toolbar-button" aria-hidden="true">T</span>
+      <span class="toolbar-button" aria-hidden="true">▭</span>
+      <span class="toolbar-divider"></span>
+      <span class="toolbar-mini">24.00 fps</span>
+    </div>
+    <div class="toolkit-center"><span class="sparkle">✳</span> THIS IS A WEBSITE, NOT AN EDITOR <span class="sparkle">✳</span></div>
+    <button class="toolbar-social" data-route="links"><span class="button-dot"></span> SOCIALS <span>↗</span></button>
+  </div>
+
+  <main class="workspace">
+    <aside class="project-panel ae-panel" aria-label="Site navigation">
+      <div class="pane-tabs"><span class="pane-tab current">Project</span><span class="pane-tab">Effect Controls</span><span class="pane-grip">⋮</span></div>
+      <div class="project-summary">
+        <div class="preview-thumb"><div class="preview-thumb-mark">Ae</div><span>MASTER</span></div>
+        <div class="project-summary-info"><b id="projectBrand">YOUR NAME</b><span>1920 x 1080 (1.00)</span><span>24.00 fps / 35 seconds</span><span>RGB / 8 bpc</span></div>
       </div>
-      <div class="panel-view hidden" id="effectsPane">
-        <label class="effect-search-wrap"><span>⌕</span><input id="effectSearch" placeholder="Search Effects & Presets" autocomplete="off"></label>
-        <div class="effects-catalog" id="effectsCatalog">
-          <div class="effects-section"><span>⌄</span> Animation Presets</div>
-          <button class="effect-row" data-effect="glow">✧ <span>Glow</span><small>Stylize</small></button>
-          <button class="effect-row" data-effect="blur">◌ <span>Gaussian Blur</span><small>Blur</small></button>
-          <button class="effect-row" data-effect="shadow">▤ <span>Drop Shadow</span><small>Perspective</small></button>
-          <button class="effect-row" data-effect="saturate">◉ <span>Hue / Saturation</span><small>Color Correction</small></button>
-          <button class="effect-row" data-effect="reset">⟲ <span>Reset Effects</span><small>Utility</small></button>
-        </div>
-        <div class="panel-tip">Select a layer and click an effect to apply it.</div>
+      <div class="project-column-headers"><span>Name</span><span>Type</span></div>
+      <div class="project-list" id="projectList">
+        <div class="tree-folder">⌄ <span class="folder-icon">▣</span> PORTFOLIO_PROJECT</div>
+        <button class="tree-item selected" data-route="home"><span class="tree-icon composition-icon">◩</span><span>01_HOME</span><small>Comp</small></button>
+        <button class="tree-item" data-route="about"><span class="tree-icon composition-icon">◩</span><span>02_ABOUT</span><small>Comp</small></button>
+        <button class="tree-item" data-route="work"><span class="tree-icon composition-icon">◩</span><span>03_MY_WORK</span><small>Comp</small></button>
+        <button class="tree-item" data-route="links"><span class="tree-icon composition-icon">◩</span><span>04_SOCIALS</span><small>Comp</small></button>
+        <div class="tree-folder subfolder">⌄ <span class="folder-icon">▣</span> SOURCE_FILES</div>
+        <button class="asset-tree-row" data-route="home"><span class="file-type pink">▧</span> COVER_ART.png <small>IMG</small></button>
+        <button class="asset-tree-row" data-route="work"><span class="file-type blue">▣</span> SHOWREEL.mp4 <small>VIDEO</small></button>
+        <button class="asset-tree-row" data-route="about"><span class="file-type pink">▧</span> PROFILE_PHOTO.png <small>IMG</small></button>
+        <button class="asset-tree-row" data-route="home"><span class="file-type gold">♫</span> AUDIO_PREVIEW.mp3 <small>AUDIO</small></button>
       </div>
-      <div class="panel-bottom"><span>◈</span> PROJECT BIN <span>·</span> <span id="leftStatus">3 compositions</span></div>
-    </section>
-    <div class="resize-col" data-resize="left" aria-label="Resize project panel" role="separator"></div>
-    <section class="panel composition-panel" aria-label="Composition preview">
-      <div class="panel-tabs"><button class="tab active"><span class="tab-pink">◩</span> Composition: <span id="compTabName">INTRO_SEQUENCE</span></button><span class="comp-tab-x">×</span></div>
-      <div class="composition-toolbar">
-        <div><span class="crumb">Comp</span><span class="crumb-arrow">›</span><strong id="compBreadcrumb">INTRO_SEQUENCE</strong><span class="comp-dims">1920 × 1080</span></div>
-        <div><button class="mini-toggle" id="gridButton" title="Show guides">⊞</button><button class="mini-toggle active" id="transparencyButton" title="Toggle transparent background">◩</button></div>
-      </div>
-      <div class="viewer" id="viewer">
-        <div class="viewer-background"><div class="viewer-rulers viewer-ruler-top"></div><div class="viewer-rulers viewer-ruler-side"></div></div>
-        <div class="composition-wrap" id="compositionWrap">
-          <div id="compositionFrame" class="composition-frame" tabindex="0" aria-label="Composition canvas">
-            <div class="stage-grid hidden" id="stageGrid"></div>
-            <div class="stage-ambient"><span class="ambient-orb ambient-a"></span><span class="ambient-orb ambient-b"></span><span class="stage-grain"></span></div>
-            <div id="stageLayers"></div>
-            <div class="stage-caption">PERSONAL CREATIVE ARCHIVE <span>© 2026</span></div>
-            <div class="stage-selection hidden" id="stageSelection"><i></i><i></i><i></i><i></i><span class="selection-center">⌖</span></div>
+      <div class="project-side-footer"><span>▰</span> <span id="projectFooter">4 items / 4 placeholders</span></div>
+      <div class="project-note"><span class="notice-symbol">!</span><span>All personal content is currently placeholder content. Replace the media and links in <b>site-config.js</b>.</span></div>
+    </aside>
+
+    <section class="composition-panel ae-panel" aria-label="Website content">
+      <div class="pane-tabs composition-pane-header"><span class="pane-tab current">Composition <span class="colon">:</span> <b id="compositionTitle">01_HOME</b></span><span class="pane-tab inactive-tab">Footage</span><span class="pane-grip">☷</span></div>
+      <div class="composition-subbar"><span class="subbar-path">◩ &nbsp; <span id="crumbLabel">01_HOME</span></span><span class="subbar-details">1920 × 1080 &nbsp; | &nbsp; 24 fps &nbsp; | &nbsp; RGB</span></div>
+      <div class="composition-viewport" id="compositionViewport">
+        <div class="viewport-ruler ruler-top"></div>
+        <div class="viewport-ruler ruler-left"></div>
+        <div class="canvas-sizing">
+          <div class="composition-stage" id="compositionStage">
+            <div class="composition-noise"></div>
+
+            <!-- 01: MAIN LANDING / CASSETTE -->
+            <section class="stage-page active" id="stage-home" data-page="home">
+              <div class="stage-background-flares"><i></i><i></i><i></i></div>
+              <div class="stage-rail rail-top"><span>PORTFOLIO_001</span><span>INITIALIZING YOUR UNIVERSE...</span><span>© 2026</span></div>
+              <div class="hero-titles">
+                <span class="hero-overline" id="heroOverline">CREATIVE PORTFOLIO / 2026</span>
+                <h1 id="heroTitle">YOUR<span>NAME</span><i>®</i></h1>
+                <p id="heroSubtitle">A PERSONAL WORLD BUILT FRAME BY FRAME.</p>
+              </div>
+              <div class="cassette-shell" id="cassetteShell" aria-label="Animated cassette tape visual">
+                <div class="cassette-top-edge"></div>
+                <div class="cassette-face">
+                  <div class="cassette-screws"><i></i><i></i></div>
+                  <div class="cassette-header"><span>STEREO / TYPE I</span><span>MASTER TAPE · 001</span></div>
+                  <div class="cassette-label">
+                    <div class="cassette-label-top"><span class="cassette-side">A</span><span class="cassette-brand" id="cassetteBrand">YOUR NAME — THE COLLECTION</span><span class="cassette-duration">00:35</span></div>
+                    <div class="cassette-label-body">
+                      <div class="cassette-reels" aria-hidden="true">
+                        <div class="reel reel-one"><span class="reel-inner"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+                        <div class="tape-window"><span class="window-lines"></span></div>
+                        <div class="reel reel-two"><span class="reel-inner"><i></i><i></i><i></i><i></i><i></i><i></i></span></div>
+                      </div>
+                      <span class="window-caption">THE CREATIVE SIDE / REEL 01</span>
+                    </div>
+                    <div class="cassette-color-stripe"></div>
+                  </div>
+                  <div class="cassette-bottom"><span>HIGH FIDELITY</span><span>● NORMAL BIAS</span><span>DO NOT ERASE</span></div>
+                  <div class="cassette-head-hole"><i></i><i></i><i></i></div>
+                  <div class="cassette-screws bottom"><i></i><i></i></div>
+                </div>
+              </div>
+              <div class="hero-bottom">
+                <div class="preview-block"><button class="round-play" id="heroPlay" aria-label="Start tape preview">▶</button><div><span class="preview-caption">AUDIO / VISUAL PREVIEW</span><b id="audioTrackName">YOUR_AUDIO_TRACK.mp3</b><span class="audio-source-label" id="audioSourceLabel">NO AUDIO FILE ATTACHED</span></div></div>
+                <button class="discover-button" data-route="about">EXPLORE PROJECT <span>↗</span></button>
+              </div>
+              <div class="stage-rail rail-bottom"><span>01 — PERSONAL ARCHIVE</span><span>WEB / DIGITAL EXPERIENCE</span><span>MADE TO BE SEEN</span></div>
+            </section>
+
+            <!-- 02: ABOUT -->
+            <section class="stage-page" id="stage-about" data-page="about">
+              <div class="inner-page-heading"><span>02 / PROFILE</span><span>ABOUT_ME.aep</span></div>
+              <div class="about-layout">
+                <div class="about-photo-frame" id="profilePhotoFrame"><div class="fake-photo"><span class="photo-glyph">✳</span><span>PROFILE_PHOTO.png</span><small>PLACE YOUR PHOTO HERE</small></div><span class="frame-corner tl"></span><span class="frame-corner tr"></span><span class="frame-corner bl"></span><span class="frame-corner br"></span></div>
+                <div class="about-copy"><span class="section-kicker">HELLO WORLD / WHO I AM</span><h2 id="aboutHeadline">MADE OF<br><em>IDEAS.</em></h2><p id="aboutParagraph">Write a short introduction about yourself here. What do you make, why do you create, and what do you want people to know?</p><div class="about-tags"><span>CREATOR</span><span>MOTION</span><span>EDITOR</span></div><button class="solid-link" data-route="links">GET IN TOUCH <span>↗</span></button></div>
+              </div>
+              <div class="inner-page-footer"><span>CREATIVE IDENTITY / PLACEHOLDER</span><span>02 OF 04</span></div>
+            </section>
+
+            <!-- 03: WORK -->
+            <section class="stage-page" id="stage-work" data-page="work">
+              <div class="inner-page-heading"><span>03 / SELECTED WORK</span><span>MY_WORK.aep</span></div>
+              <div class="work-content"><div class="work-heading"><span class="section-kicker">MOTION / EDITS / PROJECTS</span><h2>SELECTED<br><em>WORK.</em></h2><p>YOUR FAVORITE PROJECTS LIVE HERE.</p></div>
+                <div class="work-grid" id="workGrid">
+                  <button class="work-card" data-work="0"><span class="work-art"><span class="work-placeholder-glyph">▷</span><span>VIDEO_01.mp4</span></span><span class="work-caption"><b>PROJECT 01</b><small>WATCH PROJECT ↗</small></span></button>
+                  <button class="work-card" data-work="1"><span class="work-art"><span class="work-placeholder-glyph">▷</span><span>VIDEO_02.mp4</span></span><span class="work-caption"><b>PROJECT 02</b><small>WATCH PROJECT ↗</small></span></button>
+                  <button class="work-card" data-work="2"><span class="work-art"><span class="work-placeholder-glyph">▷</span><span>VIDEO_03.mp4</span></span><span class="work-caption"><b>PROJECT 03</b><small>WATCH PROJECT ↗</small></span></button>
+                </div>
+              </div>
+              <div class="inner-page-footer"><span>REPLACE WITH YOUR SHOWREEL / EDITS</span><span>03 OF 04</span></div>
+            </section>
+
+            <!-- 04: SOCIALS -->
+            <section class="stage-page" id="stage-links" data-page="links">
+              <div class="inner-page-heading"><span>04 / CONTACT</span><span>SOCIAL_LINKS.aep</span></div>
+              <div class="links-content"><span class="section-kicker">STAY CONNECTED / FOLLOW THE PROJECT</span><h2>FIND ME<br><em>ONLINE.</em></h2><p>GOOD IDEAS START WITH A CONNECTION.</p><div class="links-grid" id="linksGrid"></div><div class="links-note">LINKS WILL BECOME ACTIVE WHEN PROVIDED.</div></div>
+              <div class="inner-page-footer"><span>LET'S CREATE SOMETHING</span><span>04 OF 04</span></div>
+            </section>
+
+            <div class="stage-overlay-label">YOUR CONTENT HERE <span>+ ADD MEDIA</span></div>
           </div>
         </div>
-        <div class="viewer-hint">CLICK A LAYER TO EDIT • DRAG TO MOVE • SPACE TO PREVIEW</div>
+        <span class="viewport-corner" aria-hidden="true">+</span>
       </div>
-      <div class="preview-toolbar">
-        <div class="preview-left"><button id="zoomButton" class="preview-select">Fit <span>⌄</span></button><button id="resButton" class="preview-select">Full <span>⌄</span></button><span class="preview-divider"></span><button class="mini-toggle active" id="checkerButton" title="Toggle transparency grid">◩</button><button class="mini-toggle" id="safeButton" title="Safe margins">⊞</button></div>
-        <div class="preview-center"><span class="timecode" id="viewerTime">00:00:00:00</span><span class="tiny-divider">│</span><span class="fps">24 fps</span></div>
-        <div class="preview-right"><span class="preview-quality">Adaptive Resolution (1/2)</span><span class="quality-circle"></span></div>
-      </div>
+      <div class="viewer-controls"><div><button class="viewer-mini">Fit <span>⌄</span></button><button class="viewer-mini">Full <span>⌄</span></button><span class="viewer-sep"></span><span class="viewer-icon">⊞</span><span class="viewer-icon">◫</span></div><div><span id="currentTimeViewer" class="viewer-time">00:00:00:00</span><span class="viewer-sep"></span><span>24.00 fps</span></div><div><span class="viewer-icon">◈</span><span>Active Camera</span></div></div>
     </section>
-    <div class="resize-col" data-resize="right" aria-label="Resize properties panel" role="separator"></div>
-    <section class="panel inspector-panel" aria-label="Properties and preview">
-      <div class="panel-tabs"><button class="tab active" data-right-tab="properties">Properties</button><button class="tab" data-right-tab="info">Info</button><button class="tab" data-right-tab="preview">Preview</button><div class="panel-tab-more">⋮</div></div>
-      <div class="panel-view inspector-view" id="propertiesPane">
-        <div class="inspector-selected"><div class="selected-icon">⌗</div><div><small>SELECTED LAYER</small><strong id="selectedLayerName">NO SELECTION</strong></div></div>
-        <div class="inspector-content" id="inspectorContent"><div class="inspector-empty">Select a layer in the composition<br>or timeline to edit properties.</div></div>
-      </div>
-      <div class="panel-view hidden" id="infoPane"><div class="info-pane"><h4>COMPOSITION INFO</h4><dl><dt>Width</dt><dd>1920 px</dd><dt>Height</dt><dd>1080 px</dd><dt>Frame rate</dt><dd>24 fps</dd><dt>Duration</dt><dd>00:00:12:00</dd><dt>Color space</dt><dd>Rec.709</dd><dt>Working space</dt><dd>Web / sRGB</dd></dl><p>Interactive, browser-based AE-inspired creative experience.</p></div></div>
-      <div class="panel-view hidden" id="previewPane"><div class="preview-pane"><h4>PREVIEW</h4><div class="preview-buttons"><button id="goStart">|◀</button><button id="stepBack">◀</button><button id="previewToggle">▶</button><button id="stepNext">▶|</button></div><p>Space — Play / Pause<br>← / → — Previous / next frame</p></div></div>
-      <div class="right-bottom-card"><span class="small-label">CREATOR NETWORK</span><strong id="sideCreator">YOUR CREATIVE SPACE</strong><p id="sideTagline">Motion design, experiments and things worth sharing.</p><button id="rightOpenSocials">OPEN CONTACT CARD <span>↗</span></button></div>
-    </section>
-    <div class="resize-row" data-resize="timeline" role="separator" aria-label="Resize timeline panel"></div>
-    <section class="panel timeline-panel" aria-label="Timeline and layers">
-      <div class="panel-tabs timeline-tabs"><button class="tab active"><span class="tab-pink">◩</span> <span id="timelineCompName">INTRO_SEQUENCE</span></button><div class="timeline-tab-right"><span>⏱</span> TIMELINE <span id="timelineDuration">12s</span></div></div>
-      <div class="timeline-controls">
-        <div class="timeline-left-controls"><button id="goBeginning" title="Beginning">|◀</button><button id="prevFrame" title="Previous frame">◀</button><button id="playToggle" title="Play / Pause (Space)" class="play-button">▶</button><button id="nextFrame" title="Next frame">▶|</button><button id="goEnd" title="End">▶|</button><span class="transport-divider"></span><span class="timeline-time" id="timelineTime">00:00:00:00</span></div>
-        <div class="timeline-right-controls"><button id="addTextButton" title="Add text layer">+ Text</button><button id="addShapeButton" title="Add shape layer">+ Shape</button><button id="addKeyButton" title="Add keyframe at playhead">◆</button><button id="deleteLayerButton" title="Delete selected layer">⌫</button><span class="transport-divider"></span><button id="timelineZoomOut" title="Zoom out">−</button><span id="timelineZoomLabel">100%</span><button id="timelineZoomIn" title="Zoom in">+</button></div>
-      </div>
-      <div class="timeline-body">
-        <div class="layer-list">
-          <div class="timeline-header"><span class="twisty">▾</span><span class="layer-label">LAYER NAME</span><div class="layer-head-icons">◉ &nbsp; ♢ &nbsp; 🔒</div></div>
-          <div id="layerRows" class="layer-rows"></div>
+
+    <aside class="inspector-panel ae-panel" aria-label="Project information">
+      <div class="pane-tabs"><span class="pane-tab current">Info</span><span class="pane-tab">Preview</span><span class="pane-tab">Align</span></div>
+      <div class="inspect-content"><div class="inspector-top">CREATOR DATA <span>■ RGB</span></div><div class="inspector-property"><span>COMP</span><strong id="inspectorComp">01_HOME</strong></div><div class="inspector-property"><span>TYPE</span><strong>PERSONAL WEBSITE</strong></div><div class="inspector-property"><span>RESOLUTION</span><strong>1920 × 1080</strong></div><div class="inspector-property"><span>FORMAT</span><strong>HTML / CSS / JS</strong></div><div class="inspector-property"><span>STATUS</span><strong class="inspector-online">● LIVE</strong></div>
+        <div class="inspect-divider"></div><div class="inspector-top">EFFECT CONTROLS <span>fx</span></div>
+        <div class="effect-list">
+          <div><span>◉</span> Glow <small>ON</small></div><div><span>◉</span> Vignette <small>ON</small></div><div><span>◉</span> Noise Texture <small>ON</small></div><div><span>◉</span> Personal Identity <small>PENDING</small></div>
         </div>
-        <div class="timeline-tracks" id="timelineTracks">
-          <div id="timeRuler" class="time-ruler"></div>
-          <div class="playhead" id="playhead"><div class="playhead-head"></div></div>
-          <div id="trackRows" class="track-rows"></div>
-        </div>
+        <div class="inspector-empty-preview"><span class="inspector-star">✳</span><span>YOUR BRAND.<br>YOUR WORLD.<br>YOUR STORY.</span><small>UPLOAD ASSETS TO COMPLETE.</small></div>
       </div>
-      <div class="timeline-footer"><span>◈ <span id="timelineFooterLayers">0</span> LAYERS</span><span>RENDERER: WEBGL / CSS</span><span>AUTOSAVE ENABLED</span></div>
+      <div class="inspector-bottom"><button data-route="links">CONTACTS <span>↗</span></button><small>CREATOR / PORTFOLIO</small></div>
+    </aside>
+
+    <section class="timeline-panel ae-panel" aria-label="Website navigation timeline">
+      <div class="pane-tabs timeline-tabs"><span class="pane-tab current">◩ &nbsp; <span id="timelineComp">01_HOME</span></span><span class="timeline-tab-hint">TIMELINE / CLICK A LAYER TO NAVIGATE</span></div>
+      <div class="timeline-transport"><div class="transport-left"><button id="restartPreview" aria-label="Restart preview">|◀</button><button id="togglePreview" aria-label="Toggle preview">▶</button><span id="timecode" class="timecode">00:00:00:00</span><span class="thin-separator"></span><span class="transport-hint">35 SEC / VISUAL LOOP</span></div><div class="transport-right"><span class="tiny-square">▤</span><span>MASTER_COMP</span><span class="thin-separator"></span><span>24.00 fps</span></div></div>
+      <div class="timeline-table">
+        <div class="layer-name-column"><div class="layer-head"><span>◉</span><span>Layer Name</span><span class="layer-head-tail">Source</span></div>
+          <div class="layer-list">
+            <button class="layer-nav active" data-route="home"><span class="layer-index">01</span><span class="layer-type-icon">T</span><span class="layer-nav-name">HOME / INTRO</span><span class="layer-eye">◉</span></button>
+            <button class="layer-nav" data-route="about"><span class="layer-index">02</span><span class="layer-type-icon">T</span><span class="layer-nav-name">ABOUT_ME</span><span class="layer-eye">◉</span></button>
+            <button class="layer-nav" data-route="work"><span class="layer-index">03</span><span class="layer-type-icon">▣</span><span class="layer-nav-name">MY_WORK / EDITS</span><span class="layer-eye">◉</span></button>
+            <button class="layer-nav" data-route="links"><span class="layer-index">04</span><span class="layer-type-icon">T</span><span class="layer-nav-name">DISCORD + SOCIALS</span><span class="layer-eye">◉</span></button>
+          </div>
+        </div>
+        <div class="track-column" id="trackColumn"><div class="time-ruler" id="timeRuler"></div><div class="track-rows" id="trackRows">
+          <button class="timeline-track active" data-route="home"><span class="track-bar bar-one"><i></i><i></i><i></i></span></button>
+          <button class="timeline-track" data-route="about"><span class="track-bar bar-two"><i></i><i></i></span></button>
+          <button class="timeline-track" data-route="work"><span class="track-bar bar-three"><i></i><i></i><i></i></span></button>
+          <button class="timeline-track" data-route="links"><span class="track-bar bar-four"><i></i><i></i></span></button>
+        </div><div class="timeline-playhead" id="timelinePlayhead"><div class="playhead-top"></div></div></div>
+      </div>
+      <div class="timeline-bottom"><span>■ 4 COMP LAYERS</span><span>SELECT A LAYER TO EXPLORE THE SITE</span><span>RENDER: READY <b>●</b></span></div>
     </section>
-  </div>
-  <footer class="statusbar"><span><b class="status-green">●</b> READY <span class="muted">/</span> 24.00 FPS</span><span class="status-center">A FAN-MADE, INTERACTIVE MOTION-DESIGN WORKSPACE — NOT AFFILIATED WITH ADOBE</span><button id="footerContacts">CONNECT WITH CREATOR <span>↗</span></button></footer>
+  </main>
+  <footer class="app-statusbar"><span><span class="status-led"></span> ADOBE INSPIRED INTERFACE / PERSONAL PORTFOLIO</span><span>NOT AFFILIATED WITH ADOBE</span><span><kbd>SPACE</kbd> PREVIEW <span class="status-divider">·</span> <kbd>1–4</kbd> NAVIGATE</span></footer>
 </div>
-<input type="file" id="mediaInput" accept="image/png,image/jpeg,image/webp,image/gif" hidden multiple>
-<input type="file" id="jsonInput" accept=".json,application/json" hidden>
-<dialog class="about-dialog" id="aboutDialog">
-  <div class="dialog-window-bar"><span><span class="tab-pink">◩</span> CONTACTS.aep — CREATOR PROFILE</span><button id="closeAbout" aria-label="Close">×</button></div>
-  <div class="about-content">
-    <div class="about-eyebrow"><span class="live-dot"></span> CREATOR / AVAILABLE ONLINE</div>
-    <div class="about-symbol">A<span>e</span><span class="symbol-spark">✳</span></div>
-    <h1 id="aboutName">YOUR CREATIVE SPACE</h1>
-    <p id="aboutDescription">Creating animations, tools, and little experiments on the internet.</p>
-    <div class="about-links" id="aboutLinks"></div>
-    <div class="about-bottom"><span>THANKS FOR STOPPING BY.</span><span>CTRL + S TO SAVE THE PROJECT</span></div>
-  </div>
-</dialog>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<dialog class="video-dialog" id="videoDialog" aria-labelledby="videoDialogTitle"><div class="video-dialog-header"><strong id="videoDialogTitle">PROJECT PREVIEW</strong><button id="closeVideoDialog" aria-label="Close preview">✕</button></div><div id="videoDialogBody"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 </body>
 </html>
