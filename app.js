@@ -11,7 +11,7 @@
   var uid = 100;
   var state = {
     comp: "intro", comps: {}, assets: [], time: 0, selected: null,
-    playing: false, zoom: 100, activeProp: "opacity",
+    playing: false, zoom: 100, stageZoom: 100, panX: 0, panY: 0, quality: "Full", activeProp: "opacity",
     tool: "select", grid: false, safe: false, checker: false,
     leftTab: "project", rightTab: "properties"
   };
@@ -144,6 +144,13 @@
     return Object.keys(clean).length ? clean : buildDefaults();
   }
 
+  function refreshViewer(){
+    var wrap=$("#compositionWrap");
+    wrap.style.transform="translate("+state.panX+"px,"+state.panY+"px) scale("+(state.stageZoom/100)+")";
+    wrap.style.imageRendering=state.quality==="Quarter"?"pixelated":"auto";
+    $("#zoomButton").innerHTML=(state.stageZoom===100?"Fit":state.stageZoom+"%")+" <span>⌄</span>";
+    $("#resButton").innerHTML=state.quality+" <span>⌄</span>";
+  }
   function drawStage() {
     var frame = $("#compositionFrame"), root = $("#stageLayers");
     if (!frame || !root) return;
@@ -198,13 +205,15 @@
     if (selected && selected.style.display!=="none") {
       var r=selected.getBoundingClientRect(), fr=frame.getBoundingClientRect();
       selection.classList.remove("hidden");
-      selection.style.left = (r.left-fr.left+r.width/2)+"px";
-      selection.style.top = (r.top-fr.top+r.height/2)+"px";
-      selection.style.width = r.width+"px";selection.style.height=r.height+"px";
+      var z=state.stageZoom/100;
+      selection.style.left = ((r.left-fr.left+r.width/2)/z)+"px";
+      selection.style.top = ((r.top-fr.top+r.height/2)/z)+"px";
+      selection.style.width = (r.width/z)+"px";selection.style.height=(r.height/z)+"px";
     } else selection.classList.add("hidden");
     $("#stageGrid").classList.toggle("hidden",!state.grid);
     frame.classList.toggle("safe-margins",state.safe);
     frame.classList.toggle("checker",state.checker);
+    refreshViewer();
   }
   function makeFilter(layer){
     var f = layer.effects || {};
@@ -605,6 +614,8 @@
     $("#safeButton").addEventListener("click",toggleSafe);
     $("#checkerButton").addEventListener("click",toggleChecker);
     $("#transparencyButton").addEventListener("click",toggleChecker);
+    $("#zoomButton").addEventListener("click",function(){var values=[100,75,50,125,150];state.stageZoom=values[(values.indexOf(state.stageZoom)+1)%values.length];drawStage();toast("Viewer zoom: "+state.stageZoom+"%");});
+    $("#resButton").addEventListener("click",function(){var values=["Full","Half","Quarter"];state.quality=values[(values.indexOf(state.quality)+1)%values.length];drawStage();toast("Preview quality: "+state.quality);});
     $("#timelineZoomOut").addEventListener("click",function(){state.zoom=clamp(state.zoom-25,50,200);drawRuler();drawPlayhead();});
     $("#timelineZoomIn").addEventListener("click",function(){state.zoom=clamp(state.zoom+25,50,200);drawRuler();drawPlayhead();});
     $("#selectTool").addEventListener("click",function(){state.tool="select";$("#selectTool").classList.add("active");$("#handTool").classList.remove("active");});
@@ -693,7 +704,11 @@
     $("#compositionFrame").addEventListener("pointerdown",function(e){
       var node=e.target.closest("[data-layer-id]");
       if(!node){if(state.tool!=="hand")chooseLayer(null);return;}
-      if(state.tool==="hand")return;
+      if(state.tool==="hand"){
+        dragging={hand:true,clientX:e.clientX,clientY:e.clientY,x:state.panX,y:state.panY};
+        $("#compositionFrame").setPointerCapture(e.pointerId);
+        return;
+      }
       var l=currentLayers().find(function(x){return x.id===node.dataset.layerId;});if(!l)return;
       chooseLayer(l.id);
       if(l.locked)return;
@@ -702,6 +717,11 @@
     });
     $("#compositionFrame").addEventListener("pointermove",function(e){
       if(!dragging)return;
+      if(dragging.hand){
+        state.panX=dragging.x+(e.clientX-dragging.clientX);
+        state.panY=dragging.y+(e.clientY-dragging.clientY);
+        refreshViewer();return;
+      }
       var l=currentLayers().find(function(x){return x.id===dragging.id;});
       if(!l)return;
       var rect=this.getBoundingClientRect();
