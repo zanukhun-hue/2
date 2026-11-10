@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Null Object neon composition artwork">
+<defs>
+<radialGradient id="bg"><stop stop-color="#2b163a"/><stop offset=".6" stop-color="#100c19"/><stop offset="1" stop-color="#050609"/></radialGradient>
+<linearGradient id="neon" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ac66fa"/><stop offset=".55" stop-color="#eab8fe"/><stop offset="1" stop-color="#ff9c66"/></linearGradient>
+<filter id="blur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="18"/></filter>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/>
+<ellipse cx="740" cy="440" rx="625" ry="353" fill="none" stroke="#5c37ad" stroke-width="42" opacity=".35" filter="url(#blur)"/>
+<ellipse cx="740" cy="440" rx="625" ry="353" fill="none" stroke="url(#neon)" stroke-width="5" opacity=".75"/>
+<g fill="none" stroke="url(#neon)" stroke-linecap="round" stroke-linejoin="round" stroke-width="9">
+<path d="M350 312 491 244 604 309 457 393ZM350 312v191l107 89V393m147-84v183l-147 100"/>
+<path d="M415 273q-35-48-18-65t44 22M603 420q55-20 84-92"/>
+<rect x="670" y="177" width="138" height="128" rx="22" transform="rotate(12 739 241)"/>
+<path d="M358 483q-47 44-38 111m169-12-30 131 68 0 37-116m-30 0 56 116h66l-76-154"/>
+<ellipse cx="425" cy="452" rx="8" ry="15" fill="#f8e9ff" stroke="none"/><ellipse cx="525" cy="437" rx="8" ry="15" fill="#f8e9ff" stroke="none"/><path d="M446 516q39 42 83-1"/>
+<ellipse cx="530" cy="727" rx="260" ry="41" stroke-width="5"/>
+</g>
+<g fill="#fdf7ff" font-family="Arial,sans-serif"><text x="695" y="267" font-weight="900" font-size="63" transform="rotate(12 739 241)">Ae</text>
+<text x="820" y="465" font-weight="900" font-size="100" letter-spacing="-5">NULL OBJECT</text>
+<text x="832" y="520" font-weight="700" font-size="27" letter-spacing="14" fill="#d3b0ee">AE PLUGINS</text>
+<text x="828" y="591" font-size="25" fill="#b1a5bd" letter-spacing="4">EDITS / EFFECTS / MOTION</text></g>
+<g stroke="#d9a6fa" stroke-width="4" fill="none" opacity=".7"><path d="M105 160h45m-23-22v45M1370 120h45m-23-22v45M1350 728h40m-20-20v40"/><path d="M1050 682h340v110h-340z" opacity=".6"/><path d="M1082 741h270" stroke-dasharray="8 8"/><path d="M1150 739V704m75 35v-50m75 50v-44"/></g>
+</svg>
