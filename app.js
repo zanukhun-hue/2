@@ -315,7 +315,7 @@
   }
   function chooseComp(id) {
     if(!state.comps[id])return;
-    pause();state.comp=id;state.time=0;state.selected=null;
+    pause();state.comp=id;state.time=2.3;state.selected=null;
     renderAll();queueSave();
   }
   function addLayer(type){
@@ -751,7 +751,7 @@
     restoreProject();restoreLayout();installEvents();
     $("#sideCreator").textContent=CONFIG.name || "YOUR CREATIVE SPACE";
     $("#sideTagline").textContent=CONFIG.tagline || "Motion design and experiments.";
-    renderAll();setTime(0);
+    renderAll();setTime(2.3);
     if(!sessionStorage.getItem("ae-welcome")){sessionStorage.setItem("ae-welcome","yes");setTimeout(function(){toast("Welcome to the workspace • SPACE to play • click FIND ME ONLINE to connect");},750);}
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start();
