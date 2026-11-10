@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-labelledby="t d">
+<title id="t">NULL OBJECT / AE PLUGINS</title><desc id="d">Smiling outlined geometric cube holding an After Effects badge within a circular neon logo</desc>
+<defs><radialGradient id="bg"><stop stop-color="#171221"/><stop offset="1" stop-color="#030306"/></radialGradient><filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter></defs>
+<rect width="640" height="640" fill="url(#bg)"/><g fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="320" cy="310" r="285"/><ellipse cx="280" cy="389" rx="192" ry="45" stroke-width="3"/>
+<path d="M220 250 322 196 399 246 296 306ZM220 250v130l76 61V306m103-60v141l-103 54"/>
+<path d="M280 226q-20-38-11-53t32 21" stroke-width="4"/>
+<path d="M397 317q41-19 57-85" stroke-width="8"/>
+<rect x="398" y="103" width="100" height="95" rx="19" transform="rotate(12 448 150)"/>
+<path d="M214 357q-39 45-36 73m139 7-33 82 50 0 18-69m-12 0 36 69h46l-44-96"/>
+<ellipse cx="292" cy="345" rx="6" ry="10" fill="#fff" stroke="none"/><ellipse cx="357" cy="337" rx="6" ry="10" fill="#fff" stroke="none"/>
+<path d="M303 383q25 25 50-4" stroke-width="4"/>
+<path d="M195 128v30m-15-15h30m320 253v24m-12-12h24M115 419v23m-11-12h23" stroke-width="3"/>
+<path d="M141 311q-55 12-34 33" stroke-width="2"/>
+</g>
+<g fill="#fff" font-family="Arial,sans-serif"><text x="415" y="167" font-size="52" font-weight="800" transform="rotate(12 448 150)">Ae</text><text x="320" y="511" font-weight="900" text-anchor="middle" font-size="61" letter-spacing="-3">NULL—OBJECT</text><text x="320" y="555" font-weight="600" text-anchor="middle" font-size="21" letter-spacing="11">PLUGINS</text></g>
+</svg>
