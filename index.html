@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17171b">
+  <meta name="description" content="An interactive compositing-inspired portfolio and creative workspace.">
+  <title>AE WORKSPACE — Creative Studio</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="site-config.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+<div class="shell">
+  <header class="window-bar">
+    <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+    <span class="window-app"><span class="app-square">Ae</span> AFTER EFFECTS <span class="window-dim">— CREATOR WORKSPACE</span></span>
+    <div class="window-right"><span class="live-dot"></span><span>INTERACTIVE WEB EXPERIENCE</span><button type="button" class="window-action" id="openAboutTop" title="About the creator">↗</button></div>
+  </header>
+  <nav class="menu-bar" aria-label="Main menu">
+    <div class="menu-items" id="menuItems">
+      <button class="app-menu" data-menu="file">File</button><button class="app-menu" data-menu="edit">Edit</button>
+      <button class="app-menu" data-menu="composition">Composition</button><button class="app-menu" data-menu="layer">Layer</button>
+      <button class="app-menu" data-menu="effect">Effect</button><button class="app-menu" data-menu="animation">Animation</button>
+      <button class="app-menu" data-menu="view">View</button><button class="app-menu" data-menu="window">Window</button>
+      <button class="app-menu" data-menu="help">Help</button>
+    </div>
+    <div class="menu-right"><span class="small-label">PROJECT:</span> <strong id="projectTitleMini">UNTITLED_01.aep</strong> <span class="saved-indicator" id="saveState">● AUTOSAVED</span></div>
+    <div class="menu-popover hidden" id="menuPopover" role="menu"></div>
+  </nav>
+  <div class="tools-bar">
+    <div class="tool-group">
+      <button class="tool-button active" id="selectTool" title="Selection tool (V)"><span class="cursor-glyph">⌁</span></button>
+      <button class="tool-button" id="handTool" title="Hand tool (H)">✋</button>
+      <button class="tool-button" id="textTool" title="New text layer (T)">T</button>
+      <button class="tool-button" id="shapeTool" title="New shape layer (S)">▭</button>
+      <span class="tool-separator"></span>
+      <button class="tool-button" id="importButton" title="Import image (Ctrl + I)">⇧</button>
+      <button class="tool-button" id="addSolidButton" title="New solid">▣</button>
+      <button class="tool-button" id="saveButton" title="Export project JSON (Ctrl + S)">▤</button>
+    </div>
+    <div class="top-center"><span class="small-label">WORKSPACE</span><button class="workspace-button selected">Standard <span>⌄</span></button><button class="workspace-button" id="resetWorkspace" title="Reset layout">↺</button></div>
+    <button class="top-cta" id="topSocials"><span class="social-indicator"></span> FIND ME ONLINE <span>↗</span></button>
+  </div>
+  <div class="studio" id="studio">
+    <section class="panel project-panel" aria-label="Project and effects panel">
+      <div class="panel-tabs"><button class="tab active" data-left-tab="project">Project</button><button class="tab" data-left-tab="effects">Effects & Presets</button><div class="panel-tab-more">⋮</div></div>
+      <div class="panel-view" id="projectPane">
+        <div class="project-meta">
+          <div class="project-icon">Ae</div><div><b id="projectName">CREATOR_SPACE</b><small>1920 × 1080 • 24.00 fps<br>16 bpc • RGB</small></div>
+        </div>
+        <div class="panel-section-heading"><span>PROJECT</span><div><button class="tiny-button" id="newCompButton" title="New composition">＋</button><button class="tiny-button" id="newFolderButton" title="Import image">⇧</button></div></div>
+        <div class="project-tree" id="projectTree">
+          <button class="project-item current" data-comp="intro"><span class="item-icon comp">◩</span><span>01 / INTRO_SEQUENCE</span><small>00:12</small></button>
+          <button class="project-item" data-comp="social"><span class="item-icon comp">◩</span><span>02 / ABOUT_CREATOR</span><small>00:12</small></button>
+          <button class="project-item" data-comp="showreel"><span class="item-icon comp">◩</span><span>03 / SHOWREEL</span><small>00:12</small></button>
+        </div>
+        <div class="project-assets"><div class="assets-head"><span>IMPORTS</span><span id="assetCount">0 ITEMS</span></div><div id="assetList" class="asset-list"><div class="empty-assets">Drag a JPG or PNG here<br>or click <button id="importInline">Import File</button></div></div></div>
+      </div>
+      <div class="panel-view hidden" id="effectsPane">
+        <label class="effect-search-wrap"><span>⌕</span><input id="effectSearch" placeholder="Search Effects & Presets" autocomplete="off"></label>
+        <div class="effects-catalog" id="effectsCatalog">
+          <div class="effects-section"><span>⌄</span> Animation Presets</div>
+          <button class="effect-row" data-effect="glow">✧ <span>Glow</span><small>Stylize</small></button>
+          <button class="effect-row" data-effect="blur">◌ <span>Gaussian Blur</span><small>Blur</small></button>
+          <button class="effect-row" data-effect="shadow">▤ <span>Drop Shadow</span><small>Perspective</small></button>
+          <button class="effect-row" data-effect="saturate">◉ <span>Hue / Saturation</span><small>Color Correction</small></button>
+          <button class="effect-row" data-effect="reset">⟲ <span>Reset Effects</span><small>Utility</small></button>
+        </div>
+        <div class="panel-tip">Select a layer and click an effect to apply it.</div>
+      </div>
+      <div class="panel-bottom"><span>◈</span> PROJECT BIN <span>·</span> <span id="leftStatus">3 compositions</span></div>
+    </section>
+    <div class="resize-col" data-resize="left" aria-label="Resize project panel" role="separator"></div>
+    <section class="panel composition-panel" aria-label="Composition preview">
+      <div class="panel-tabs"><button class="tab active"><span class="tab-pink">◩</span> Composition: <span id="compTabName">INTRO_SEQUENCE</span></button><span class="comp-tab-x">×</span></div>
+      <div class="composition-toolbar">
+        <div><span class="crumb">Comp</span><span class="crumb-arrow">›</span><strong id="compBreadcrumb">INTRO_SEQUENCE</strong><span class="comp-dims">1920 × 1080</span></div>
+        <div><button class="mini-toggle" id="gridButton" title="Show guides">⊞</button><button class="mini-toggle active" id="transparencyButton" title="Toggle transparent background">◩</button></div>
+      </div>
+      <div class="viewer" id="viewer">
+        <div class="viewer-background"><div class="viewer-rulers viewer-ruler-top"></div><div class="viewer-rulers viewer-ruler-side"></div></div>
+        <div class="composition-wrap" id="compositionWrap">
+          <div id="compositionFrame" class="composition-frame" tabindex="0" aria-label="Composition canvas">
+            <div class="stage-grid hidden" id="stageGrid"></div>
+            <div class="stage-ambient"><span class="ambient-orb ambient-a"></span><span class="ambient-orb ambient-b"></span><span class="stage-grain"></span></div>
+            <div id="stageLayers"></div>
+            <div class="stage-caption">PERSONAL CREATIVE ARCHIVE <span>© 2026</span></div>
+            <div class="stage-selection hidden" id="stageSelection"><i></i><i></i><i></i><i></i><span class="selection-center">⌖</span></div>
+          </div>
+        </div>
+        <div class="viewer-hint">CLICK A LAYER TO EDIT • DRAG TO MOVE • SPACE TO PREVIEW</div>
+      </div>
+      <div class="preview-toolbar">
+        <div class="preview-left"><button id="zoomButton" class="preview-select">Fit <span>⌄</span></button><button id="resButton" class="preview-select">Full <span>⌄</span></button><span class="preview-divider"></span><button class="mini-toggle active" id="checkerButton" title="Toggle transparency grid">◩</button><button class="mini-toggle" id="safeButton" title="Safe margins">⊞</button></div>
+        <div class="preview-center"><span class="timecode" id="viewerTime">00:00:00:00</span><span class="tiny-divider">│</span><span class="fps">24 fps</span></div>
+        <div class="preview-right"><span class="preview-quality">Adaptive Resolution (1/2)</span><span class="quality-circle"></span></div>
+      </div>
+    </section>
+    <div class="resize-col" data-resize="right" aria-label="Resize properties panel" role="separator"></div>
+    <section class="panel inspector-panel" aria-label="Properties and preview">
+      <div class="panel-tabs"><button class="tab active" data-right-tab="properties">Properties</button><button class="tab" data-right-tab="info">Info</button><button class="tab" data-right-tab="preview">Preview</button><div class="panel-tab-more">⋮</div></div>
+      <div class="panel-view inspector-view" id="propertiesPane">
+        <div class="inspector-selected"><div class="selected-icon">⌗</div><div><small>SELECTED LAYER</small><strong id="selectedLayerName">NO SELECTION</strong></div></div>
+        <div class="inspector-content" id="inspectorContent"><div class="inspector-empty">Select a layer in the composition<br>or timeline to edit properties.</div></div>
+      </div>
+      <div class="panel-view hidden" id="infoPane"><div class="info-pane"><h4>COMPOSITION INFO</h4><dl><dt>Width</dt><dd>1920 px</dd><dt>Height</dt><dd>1080 px</dd><dt>Frame rate</dt><dd>24 fps</dd><dt>Duration</dt><dd>00:00:12:00</dd><dt>Color space</dt><dd>Rec.709</dd><dt>Working space</dt><dd>Web / sRGB</dd></dl><p>Interactive, browser-based AE-inspired creative experience.</p></div></div>
+      <div class="panel-view hidden" id="previewPane"><div class="preview-pane"><h4>PREVIEW</h4><div class="preview-buttons"><button id="goStart">|◀</button><button id="stepBack">◀</button><button id="previewToggle">▶</button><button id="stepNext">▶|</button></div><p>Space — Play / Pause<br>← / → — Previous / next frame</p></div></div>
+      <div class="right-bottom-card"><span class="small-label">CREATOR NETWORK</span><strong id="sideCreator">YOUR CREATIVE SPACE</strong><p id="sideTagline">Motion design, experiments and things worth sharing.</p><button id="rightOpenSocials">OPEN CONTACT CARD <span>↗</span></button></div>
+    </section>
+    <div class="resize-row" data-resize="timeline" role="separator" aria-label="Resize timeline panel"></div>
+    <section class="panel timeline-panel" aria-label="Timeline and layers">
+      <div class="panel-tabs timeline-tabs"><button class="tab active"><span class="tab-pink">◩</span> <span id="timelineCompName">INTRO_SEQUENCE</span></button><div class="timeline-tab-right"><span>⏱</span> TIMELINE <span id="timelineDuration">12s</span></div></div>
+      <div class="timeline-controls">
+        <div class="timeline-left-controls"><button id="goBeginning" title="Beginning">|◀</button><button id="prevFrame" title="Previous frame">◀</button><button id="playToggle" title="Play / Pause (Space)" class="play-button">▶</button><button id="nextFrame" title="Next frame">▶|</button><button id="goEnd" title="End">▶|</button><span class="transport-divider"></span><span class="timeline-time" id="timelineTime">00:00:00:00</span></div>
+        <div class="timeline-right-controls"><button id="addTextButton" title="Add text layer">+ Text</button><button id="addShapeButton" title="Add shape layer">+ Shape</button><button id="addKeyButton" title="Add keyframe at playhead">◆</button><button id="deleteLayerButton" title="Delete selected layer">⌫</button><span class="transport-divider"></span><button id="timelineZoomOut" title="Zoom out">−</button><span id="timelineZoomLabel">100%</span><button id="timelineZoomIn" title="Zoom in">+</button></div>
+      </div>
+      <div class="timeline-body">
+        <div class="layer-list">
+          <div class="timeline-header"><span class="twisty">▾</span><span class="layer-label">LAYER NAME</span><div class="layer-head-icons">◉ &nbsp; ♢ &nbsp; 🔒</div></div>
+          <div id="layerRows" class="layer-rows"></div>
+        </div>
+        <div class="timeline-tracks" id="timelineTracks">
+          <div id="timeRuler" class="time-ruler"></div>
+          <div class="playhead" id="playhead"><div class="playhead-head"></div></div>
+          <div id="trackRows" class="track-rows"></div>
+        </div>
+      </div>
+      <div class="timeline-footer"><span>◈ <span id="timelineFooterLayers">0</span> LAYERS</span><span>RENDERER: WEBGL / CSS</span><span>AUTOSAVE ENABLED</span></div>
+    </section>
+  </div>
+  <footer class="statusbar"><span><b class="status-green">●</b> READY <span class="muted">/</span> 24.00 FPS</span><span class="status-center">A FAN-MADE, INTERACTIVE MOTION-DESIGN WORKSPACE — NOT AFFILIATED WITH ADOBE</span><button id="footerContacts">CONNECT WITH CREATOR <span>↗</span></button></footer>
+</div>
+<input type="file" id="mediaInput" accept="image/png,image/jpeg,image/webp,image/gif" hidden multiple>
+<input type="file" id="jsonInput" accept=".json,application/json" hidden>
+<dialog class="about-dialog" id="aboutDialog">
+  <div class="dialog-window-bar"><span><span class="tab-pink">◩</span> CONTACTS.aep — CREATOR PROFILE</span><button id="closeAbout" aria-label="Close">×</button></div>
+  <div class="about-content">
+    <div class="about-eyebrow"><span class="live-dot"></span> CREATOR / AVAILABLE ONLINE</div>
+    <div class="about-symbol">A<span>e</span><span class="symbol-spark">✳</span></div>
+    <h1 id="aboutName">YOUR CREATIVE SPACE</h1>
+    <p id="aboutDescription">Creating animations, tools, and little experiments on the internet.</p>
+    <div class="about-links" id="aboutLinks"></div>
+    <div class="about-bottom"><span>THANKS FOR STOPPING BY.</span><span>CTRL + S TO SAVE THE PROJECT</span></div>
+  </div>
+</dialog>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
