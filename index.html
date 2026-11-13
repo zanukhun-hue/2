@@ -35,7 +35,7 @@
         <button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="true">EN</button>
         <button type="button" data-language="ru" lang="ru" aria-label="Русский" aria-pressed="false">RU</button>
       </div>
-      <span class="mobile-active" id="mobileActive" aria-hidden="true"></span>
+      <span class="mobile-status" aria-hidden="true"><i class="mobile-active" id="mobileActive"></i><span id="mobileRoute"></span></span>
     </header>
 
     <div class="workspace">
@@ -81,12 +81,38 @@
 
             <section class="slide work-slide" id="stage-work" aria-label="Edits" data-i18n-aria="work" hidden>
               <div class="work-gallery" id="workGallery">
-                <h2 class="display-title" data-i18n="work">Edits</h2>
-                <div class="work-grid" id="workGrid"></div>
+                <div class="work-art" aria-hidden="true">
+                  <img class="work-ambient" id="workAmbient" src="assets/hero-fallback.svg" alt="">
+                  <img class="work-poster" id="workPoster" src="assets/hero-fallback.svg" alt="">
+                </div>
+                <div class="watch-overlay" id="watchOverlay">
+                  <button type="button" class="watch-play" id="watchPlay" aria-label="Play"><span aria-hidden="true">▶</span></button>
+                  <h2 class="watch-title" id="watchTitle" tabindex="-1">Edits</h2>
+                  <select class="watch-select" id="workSelect" aria-label="Choose an edit" data-i18n-aria="chooseEdit"></select>
+                </div>
+                <p class="work-empty" id="workEmpty" data-i18n="noWorks" hidden>No videos available yet.</p>
               </div>
               <div class="work-player" id="workPlayer" hidden>
                 <div class="player-bar"><button type="button" id="backToWorks" data-i18n="backToWorks">‹ All edits</button><span id="videoTitle"></span></div>
-                <video id="workVideo" playsinline controls preload="none"></video>
+                <video id="workVideo" playsinline preload="none"></video>
+                <div class="video-transport" id="videoTransport" role="group" aria-label="Video controls" data-i18n-aria="videoControls">
+                  <div class="video-scrubber">
+                    <input id="videoSeek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Video position" data-i18n-aria="videoPosition" disabled>
+                  </div>
+                  <div class="video-toolbar">
+                    <button type="button" class="video-control video-toggle" id="videoToggle" aria-label="Play video">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" data-video-play-icon><path d="m9 5 11 7-11 7Z"/></svg>
+                      <svg viewBox="0 0 24 24" aria-hidden="true" data-video-pause-icon hidden><path d="M8 5h3v14H8zm5 0h3v14h-3z"/></svg>
+                    </button>
+                    <div class="video-time"><span id="videoClock">00:00</span><span class="video-time-divider" aria-hidden="true">/</span><span id="videoDuration">00:00</span></div>
+                    <button type="button" class="video-control video-mute" id="videoMute" aria-label="Mute" aria-pressed="false">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="video-sound-wave" d="M16 9a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"/><path class="video-muted-cross" d="m16 10 5 5m0-5-5 5"/></svg>
+                    </button>
+                    <button type="button" class="video-control video-fullscreen" id="videoFullscreen" aria-label="Fullscreen" aria-pressed="false">
+                      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="video-enter-fullscreen" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/><path class="video-exit-fullscreen" d="M4 9h5V4m11 5h-5V4M4 15h5v5m11-5h-5v5"/></svg>
+                    </button>
+                  </div>
+                </div>
                 <p class="media-message" id="videoMessage" role="status"></p>
               </div>
             </section>

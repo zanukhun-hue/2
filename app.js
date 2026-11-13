@@ -16,6 +16,7 @@
   const $ = id => document.getElementById(id);
   const editor = document.querySelector(".editor");
   const viewer = $("viewer");
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
   const timelineSeek = $("timelineSeek");
   const trackColumn = $("trackColumn");
   const timelinePlay = $("timelinePlay");
@@ -34,6 +35,12 @@
   const videoMessage = $("videoMessage");
   const gallery = $("workGallery");
   const workPlayer = $("workPlayer");
+  const videoToggle = $("videoToggle");
+  const videoSeek = $("videoSeek");
+  const videoMute = $("videoMute");
+  const videoFullscreen = $("videoFullscreen");
+  const workSelect = $("workSelect");
+  const watchPlay = $("watchPlay");
   const languageSwitch = $("languageSwitch");
   const localizeMedia = [];
 
@@ -47,7 +54,12 @@
   let previewOffset = 0;
   let audioRequest = 0;
   let videoRequest = 0;
-  let activeCard;
+  let enteringSlide;
+  let leavingSlide;
+  let enterTimer;
+  let leaveTimer;
+  let swipe;
+  let snapTimer;
 
   function savedLanguage() {
     try {
@@ -97,6 +109,8 @@
     updatePreview();
     showAudioState();
     updateMuteLabel();
+    updateVideoPlayback();
+    updateVideoFullscreen();
   }
 
   function element(tag, className, label) {
@@ -226,28 +240,49 @@
   }
 
   function drawWork() {
-    const projects = Array.isArray(config.projects) ? config.projects : [];
-    projects.filter(project => project && mediaSource(project.video)).forEach((project, index) => {
-      const card = button("work-card");
-      const title = element("span", "work-title");
-      const image = element("img");
-      image.src = "assets/hero-fallback.svg";
-      image.alt = "";
-      image.loading = "lazy";
-      loadImage(image, project.poster, "assets/hero-fallback.svg");
-      card.append(image, decorative("span", "work-play", "▶"), title);
-      card.addEventListener("click", () => { openWork(project, title.textContent, card); });
-      localizeMedia.push(() => {
-        const name = project.title || project.label || translate("workFallback", { number: index + 1 });
-        title.textContent = name;
-        card.setAttribute("aria-label", translate("watchWork", { title: name }) || name);
-        if (activeCard === card) showVideoTitle(name);
-      });
-      $("workGrid").append(card);
-    });
-    if (!$("workGrid").children.length) {
-      $("workGrid").append(localizedElement("p", "media-message", "noWorks"));
+    const projects = (Array.isArray(config.projects) ? config.projects : [])
+      .filter(project => project && mediaSource(project.video));
+    if (!projects.length) {
+      gallery.hidden = true;
+      $("workEmpty").hidden = false;
+      return;
     }
+
+    const titleAt = index => {
+      const project = projects[index];
+      return project.title || project.label || translate("workFallback", { number: index + 1 });
+    };
+    const updateTitle = () => {
+      const title = titleAt(workSelect.selectedIndex);
+      $("watchTitle").textContent = title;
+      watchPlay.setAttribute("aria-label", translate("watchWork", { title }) || title);
+      if (!workPlayer.hidden) showVideoTitle(title);
+    };
+    const showPoster = () => {
+      const project = projects[workSelect.selectedIndex];
+      const fallback = "assets/hero-fallback.svg";
+      const source = mediaSource(project.poster) ? project.poster : fallback;
+      for (const image of [$("workAmbient"), $("workPoster")]) image.src = source;
+      updateTitle();
+    };
+
+    for (const image of [$("workAmbient"), $("workPoster")]) {
+      image.addEventListener("error", () => {
+        if (image.getAttribute("src") !== "assets/hero-fallback.svg") image.src = "assets/hero-fallback.svg";
+      });
+    }
+    projects.forEach(() => workSelect.append(element("option")));
+    localizeMedia.push(() => {
+      [...workSelect.options].forEach((option, index) => { option.textContent = titleAt(index); });
+      updateTitle();
+    });
+    workSelect.hidden = projects.length === 1;
+    workSelect.addEventListener("change", showPoster);
+    watchPlay.addEventListener("click", () => {
+      const index = workSelect.selectedIndex;
+      openWork(projects[index], titleAt(index));
+    });
+    showPoster();
   }
 
   function drawLinks() {
@@ -301,19 +336,94 @@
     else history.replaceState(null, "", hash);
   }
 
-  function showRoute(route, historyMode) {
+  function finishEntrance() {
+    clearTimeout(enterTimer);
+    if (!enteringSlide) return;
+    enteringSlide.classList.remove("is-entering");
+    enteringSlide.style.removeProperty("--slide-direction");
+    enteringSlide = undefined;
+  }
+
+  function finishExit() {
+    clearTimeout(leaveTimer);
+    if (!leavingSlide) return;
+    leavingSlide.hidden = true;
+    if (leavingSlide.id === "stage-work") closeWork(false);
+    leavingSlide.inert = false;
+    leavingSlide.removeAttribute("aria-hidden");
+    leavingSlide.classList.remove("is-leaving");
+    leavingSlide.style.removeProperty("--slide-direction");
+    leavingSlide.style.removeProperty("--swipe-x");
+    leavingSlide = undefined;
+  }
+
+  function clearSwipe(preserveSlide) {
+    clearTimeout(snapTimer);
+    viewer.classList.remove("is-swiping", "is-snapping");
+    if (swipe && swipe.slide !== preserveSlide) swipe.slide.style.removeProperty("--swipe-x");
+    swipe = undefined;
+  }
+
+  function focusHeading(slide) {
+    const heading = slide.querySelector("h2");
+    const target = heading && !heading.closest("[hidden]") ? heading : slide;
+    target.tabIndex = -1;
+    target.focus({ preventScroll: true });
+  }
+
+  function showRoute(route, historyMode, { animate = true, direction } = {}) {
+    const useMotion = animate && !reducedMotion.matches;
     if (selectedRoute === route) {
+      if (!useMotion) {
+        finishEntrance();
+        finishExit();
+        clearSwipe();
+      }
       setHash(route.id, historyMode);
       return;
     }
 
+    const previousRoute = selectedRoute;
+    const previous = previousRoute && $("stage-" + previousRoute.id);
+    const current = $("stage-" + route.id);
+    const transferFocus = previous?.contains(document.activeElement);
+    const index = routes.indexOf(route);
+    const travel = direction || (index > routes.indexOf(previousRoute) ? 1 : -1);
+    finishEntrance();
+    finishExit();
+    clearSwipe(useMotion ? previous : undefined);
+
     if (selectedRoute?.id === "home") stopAudio();
-    if (selectedRoute?.id === "work") closeWork(false);
+    if (selectedRoute?.id === "work") {
+      if (useMotion && !workPlayer.hidden) {
+        videoRequest++;
+        video.pause();
+      } else {
+        closeWork(false);
+      }
+    }
     selectedRoute = route;
 
+    current.hidden = false;
+    if (transferFocus) focusHeading(current);
     routes.forEach(item => {
-      $("stage-" + item.id).hidden = item !== route;
+      const slide = $("stage-" + item.id);
+      slide.hidden = slide !== current && !(useMotion && slide === previous);
     });
+    if (useMotion) {
+      if (previous) {
+        leavingSlide = previous;
+        previous.inert = true;
+        previous.setAttribute("aria-hidden", "true");
+        previous.style.setProperty("--slide-direction", travel);
+        previous.classList.add("is-leaving");
+        leaveTimer = setTimeout(finishExit, 220);
+      }
+      enteringSlide = current;
+      current.style.setProperty("--slide-direction", travel);
+      current.classList.add("is-entering");
+      enterTimer = setTimeout(finishEntrance, 1000);
+    }
     document.querySelectorAll("[data-route]").forEach(control => {
       const active = control.dataset.route === route.id;
       if (control.closest(".slide")) return;
@@ -322,19 +432,20 @@
       else control.removeAttribute("aria-current");
     });
 
-    const index = routes.indexOf(route);
     const chip = $("mobileSections").children[index];
     if (chip.offsetWidth) {
       $("mobileSections").scrollLeft = chip.offsetLeft - $("mobileSections").offsetLeft -
         ($("mobileSections").clientWidth - chip.offsetWidth) / 2;
     }
     $("mobileActive").style.setProperty("--route-color", route.color);
+    const mobileRoute = $("mobileRoute");
+    if (mobileRoute) setMessage(mobileRoute, route.id);
 
     $("compositionSource").textContent = route.source;
     setHash(route.id, historyMode);
   }
 
-  function setTime(time, historyMode = "replace") {
+  function setTime(time, historyMode = "replace", motion) {
     seconds = Math.max(0, Math.min(duration, time));
     const label = timecode(seconds);
     $("timecode").value = label;
@@ -343,22 +454,22 @@
     timelineSeek.setAttribute("aria-valuetext", label);
     trackColumn.style.setProperty("--playhead", percent(seconds));
     const route = routes.findLast(item => seconds >= item.start);
-    showRoute(route, historyMode);
+    showRoute(route, historyMode, motion);
   }
 
   function seek(time) {
     pausePreview();
-    setTime(time);
+    setTime(time, "replace", { animate: false });
   }
 
-  function navigate(route, historyMode = "push") {
+  function navigate(route, historyMode = "push", direction) {
     pausePreview();
-    setTime(route.start, historyMode);
+    setTime(route.start, historyMode, { direction });
   }
 
   function step(direction) {
     const index = routes.indexOf(selectedRoute);
-    navigate(routes[(index + direction + routes.length) % routes.length]);
+    navigate(routes[(index + direction + routes.length) % routes.length], "push", direction);
   }
 
   function updatePreview() {
@@ -393,7 +504,7 @@
       return;
     }
     stopAudio();
-    closeWork(false);
+    if (selectedRoute.id === "work") closeWork(false);
     if (seconds >= duration) setTime(0);
     previewStart = performance.now();
     previewOffset = seconds;
@@ -444,7 +555,6 @@
       return;
     }
     pausePreview();
-    closeWork(false);
     const request = ++audioRequest;
     setMessage(audioMessage);
     if (audio.ended) audio.currentTime = 0;
@@ -468,8 +578,16 @@
 
   function updateMuteLabel() {
     const silent = audio.muted || audio.volume === 0;
-    mute.setAttribute("aria-label", translate(silent ? "unmute" : "mute"));
-    mute.setAttribute("aria-pressed", String(silent));
+    const label = translate(silent ? "unmute" : "mute");
+    for (const control of [mute, videoMute]) {
+      control.setAttribute("aria-label", label);
+      control.setAttribute("aria-pressed", String(silent));
+    }
+  }
+
+  function toggleMute() {
+    const silent = audio.muted || audio.volume === 0;
+    setVolume(audio.volume || 0.8, !silent);
   }
 
   function configureAudio() {
@@ -512,24 +630,110 @@
     applyAudioTrack(tracks);
   }
 
-  async function openWork(project, title, card) {
+  function openWork(project, title) {
     pausePreview();
     stopAudio();
-    activeCard = card;
-    const request = ++videoRequest;
     showVideoTitle(title);
-    setMessage(videoMessage);
     video.poster = mediaSource(project.poster) ? project.poster : "";
     video.src = project.video;
     gallery.hidden = true;
     workPlayer.hidden = false;
-    $("backToWorks").focus();
+    updateVideoPosition();
+    $("backToWorks").focus({ preventScroll: true });
+    playWork();
+  }
+
+  async function playWork() {
+    const request = ++videoRequest;
+    setMessage(videoMessage);
     try {
+      if (video.ended) video.currentTime = 0;
       await video.play();
     } catch (error) {
       if (request !== videoRequest) return;
       setMessage(videoMessage, error.name === "NotAllowedError" ? "videoBlocked" : "videoPlayError");
     }
+  }
+
+  function toggleVideo() {
+    if (video.paused || video.ended) playWork();
+    else {
+      videoRequest++;
+      video.pause();
+    }
+  }
+
+  function videoTimeLabel(time) {
+    const whole = Math.floor(Number.isFinite(time) ? time : 0);
+    return String(Math.floor(whole / 60)).padStart(2, "0") + ":" + String(whole % 60).padStart(2, "0");
+  }
+
+  function updateVideoPosition() {
+    const total = video.duration;
+    const elapsed = video.currentTime;
+    const seekable = Number.isFinite(total) && total > 0;
+    const position = seekable ? elapsed / total * 100 : 0;
+    const current = videoTimeLabel(elapsed);
+    const length = videoTimeLabel(total);
+    videoSeek.disabled = !seekable;
+    videoSeek.value = position;
+    videoSeek.style.setProperty("--fill", position + "%");
+    videoSeek.setAttribute("aria-valuetext", current + " / " + length);
+    $("videoClock").textContent = current;
+    $("videoDuration").textContent = length;
+  }
+
+  function updateVideoPlayback() {
+    const active = !video.paused && !video.ended;
+    videoToggle.querySelector("[data-video-play-icon]").hidden = active;
+    videoToggle.querySelector("[data-video-pause-icon]").hidden = !active;
+    videoToggle.setAttribute("aria-label", translate(active ? "videoPause" : "videoPlay"));
+    videoToggle.setAttribute("aria-pressed", String(active));
+  }
+
+  function videoExpanded() {
+    return document.fullscreenElement === workPlayer || workPlayer.classList.contains("is-expanded");
+  }
+
+  function updateVideoFullscreen() {
+    const expanded = videoExpanded();
+    videoFullscreen.setAttribute("aria-label", translate(expanded ? "videoExitFullscreen" : "videoFullscreen"));
+    videoFullscreen.setAttribute("aria-pressed", String(expanded));
+  }
+
+  async function collapseVideo() {
+    if (workPlayer.hasAttribute("popover")) {
+      workPlayer.hidePopover?.();
+      workPlayer.removeAttribute("popover");
+    }
+    workPlayer.classList.remove("is-expanded");
+    if (document.fullscreenElement === workPlayer) {
+      try { await document.exitFullscreen(); } catch {
+        // The browser may already be closing fullscreen.
+      }
+    }
+    updateVideoFullscreen();
+  }
+
+  async function toggleVideoFullscreen() {
+    if (videoExpanded()) {
+      await collapseVideo();
+      return;
+    }
+    try {
+      await workPlayer.requestFullscreen();
+      if (workPlayer.hidden) await collapseVideo();
+    } catch {
+      if (!workPlayer.hidden) {
+        workPlayer.classList.add("is-expanded");
+        if (typeof workPlayer.showPopover === "function") {
+          workPlayer.setAttribute("popover", "manual");
+          workPlayer.showPopover();
+          videoFullscreen.focus({ preventScroll: true });
+        }
+      }
+    }
+    updateVideoFullscreen();
   }
 
   function showVideoTitle(title) {
@@ -540,13 +744,15 @@
   function closeWork(restoreFocus) {
     if (workPlayer.hidden) return;
     videoRequest++;
+    if (videoExpanded()) collapseVideo();
     video.pause();
     video.removeAttribute("src");
     video.load();
     workPlayer.hidden = true;
     gallery.hidden = false;
-    if (restoreFocus) activeCard?.focus();
-    activeCard = null;
+    updateVideoPosition();
+    updateVideoPlayback();
+    if (restoreFocus) watchPlay.focus();
   }
 
   function bindTimeline() {
@@ -591,23 +797,49 @@
       }
     }, { passive: false });
 
-    let touchStart;
     viewer.addEventListener("touchstart", event => {
+      clearSwipe();
       if (event.touches.length !== 1 || event.target.closest("video,select,input,button,a")) return;
       const { clientX, clientY } = event.touches[0];
-      touchStart = { x: clientX, y: clientY };
+      swipe = {
+        slide: $("stage-" + selectedRoute.id), x: clientX, y: clientY, width: viewer.clientWidth
+      };
     }, { passive: true });
-    viewer.addEventListener("touchend", event => {
-      if (!touchStart) return;
-      const { clientX, clientY } = event.changedTouches[0];
-      const deltaX = clientX - touchStart.x;
-      const deltaY = clientY - touchStart.y;
-      if (Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
-        step(deltaX < 0 ? 1 : -1);
+    viewer.addEventListener("touchmove", event => {
+      if (!swipe || event.touches.length !== 1) return;
+      const { clientX, clientY } = event.touches[0];
+      const distance = clientX - swipe.x;
+      const rise = Math.abs(clientY - swipe.y);
+      if (!swipe.dragging) {
+        if (rise >= 12 && rise > Math.abs(distance)) {
+          clearSwipe();
+          return;
+        }
+        if (Math.abs(distance) < 12 || Math.abs(distance) <= rise * 1.3) return;
+        swipe.dragging = true;
       }
-      touchStart = undefined;
+      if (!reducedMotion.matches) {
+        const limit = swipe.width * 0.24;
+        const offset = Math.max(-limit, Math.min(limit, distance * 0.65));
+        swipe.slide.style.setProperty("--swipe-x", offset + "px");
+        viewer.classList.add("is-swiping");
+      }
     }, { passive: true });
-    viewer.addEventListener("touchcancel", () => { touchStart = undefined; }, { passive: true });
+    function endSwipe(event) {
+      if (!swipe) return;
+      const distance = (event.changedTouches[0]?.clientX ?? swipe.x) - swipe.x;
+      if (event.type === "touchend" && swipe.dragging && Math.abs(distance) >= 45) {
+        step(distance < 0 ? 1 : -1);
+      } else if (viewer.classList.contains("is-swiping")) {
+        viewer.classList.replace("is-swiping", "is-snapping");
+        swipe.slide.style.removeProperty("--swipe-x");
+        snapTimer = setTimeout(clearSwipe, 250);
+      } else {
+        clearSwipe();
+      }
+    }
+    viewer.addEventListener("touchend", endSwipe, { passive: true });
+    viewer.addEventListener("touchcancel", endSwipe, { passive: true });
   }
 
   function routeFromHash() {
@@ -616,16 +848,34 @@
 
   function handleKeys(event) {
     if (event.key === "Escape") {
-      if (fileMenu.open) {
+      if (videoExpanded()) {
+        collapseVideo();
+      } else if (fileMenu.open) {
         fileMenu.open = false;
         fileMenu.querySelector("summary").focus();
-      } else if (!workPlayer.hidden) {
+      } else if (selectedRoute.id === "work" && !workPlayer.hidden) {
         closeWork(true);
       }
       return;
     }
-    if (event.altKey || event.ctrlKey || event.metaKey ||
-      event.target.closest("input,select,textarea,video,[contenteditable]")) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    if (!workPlayer.hidden && workPlayer.contains(event.target) && !event.target.closest("input,select,textarea")) {
+      if (event.code === "Space" && !event.target.closest("button,a") && !event.repeat) {
+        event.preventDefault();
+        toggleVideo();
+        return;
+      }
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+        event.preventDefault();
+        if (Number.isFinite(video.duration)) {
+          const delta = event.key === "ArrowLeft" ? -5 : 5;
+          video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + delta));
+          updateVideoPosition();
+        }
+        return;
+      }
+    }
+    if (event.target.closest("input,select,textarea,video,[contenteditable]")) return;
 
     if (event.code === "Space" && !event.target.closest("button,a,summary")) {
       event.preventDefault();
@@ -669,11 +919,7 @@
       event.preventDefault();
       const route = routes.find(item => item.id === control.dataset.route);
       navigate(route);
-      if (control.closest(".slide")) {
-        const heading = $("stage-" + route.id).querySelector("h2");
-        heading.tabIndex = -1;
-        heading.focus({ preventScroll: true });
-      }
+      if (control.closest(".slide")) focusHeading($("stage-" + route.id));
       if (fileMenu.open) fileMenu.querySelector("summary").focus();
       fileMenu.open = false;
       return;
@@ -686,12 +932,20 @@
   document.addEventListener("keydown", handleKeys);
   document.addEventListener("visibilitychange", () => {
     if (!document.hidden) return;
+    finishEntrance();
+    finishExit();
+    clearSwipe();
     pausePreview();
     stopAudio();
     video.pause();
   });
   window.addEventListener("hashchange", () => {
     navigate(routeFromHash() || routes[0], "replace");
+  });
+  reducedMotion.addEventListener("change", () => {
+    finishEntrance();
+    finishExit();
+    clearSwipe();
   });
 
   $("toggleGuides").addEventListener("click", event => {
@@ -702,12 +956,25 @@
   timelinePlay.addEventListener("click", togglePreview);
   $("menuPreview").addEventListener("click", togglePreview);
   $("backToWorks").addEventListener("click", () => { closeWork(true); });
+  videoToggle.addEventListener("click", toggleVideo);
+  video.addEventListener("click", toggleVideo);
+  videoSeek.addEventListener("input", () => {
+    if (!Number.isFinite(video.duration)) return;
+    video.currentTime = Number(videoSeek.value) / 100 * video.duration;
+    updateVideoPosition();
+  });
+  videoMute.addEventListener("click", toggleMute);
+  videoFullscreen.addEventListener("click", toggleVideoFullscreen);
+  document.addEventListener("fullscreenchange", updateVideoFullscreen);
+  for (const event of ["loadedmetadata", "durationchange", "timeupdate", "seeked", "emptied"]) {
+    video.addEventListener(event, updateVideoPosition);
+  }
+  for (const event of ["play", "pause", "ended", "emptied"]) {
+    video.addEventListener(event, updateVideoPlayback);
+  }
   video.addEventListener("error", () => {
-    if (!workPlayer.hidden) setMessage(videoMessage, "videoLoadError");
+    if (selectedRoute.id === "work" && !workPlayer.hidden) setMessage(videoMessage, "videoLoadError");
   });
   volume.addEventListener("input", () => { setVolume(Number(volume.value)); });
-  mute.addEventListener("click", () => {
-    const muted = audio.muted || audio.volume === 0;
-    setVolume(audio.volume || 0.8, !muted);
-  });
+  mute.addEventListener("click", toggleMute);
 })();
