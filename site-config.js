@@ -31,12 +31,6 @@ window.PORTFOLIO = {
       poster: "assets/work01-feature.jpg"
     },
     {
-      title: "Code Geass",
-      label: "CC_Lelouch_final_1080p_apo8(1).mp4",
-      video: "assets/work02.mp4",
-      poster: "assets/work02_poster.jpg"
-    },
-    {
       title: "Kaguya-sama: Love Is War",
       label: "шашлыыык 2_prob3.mp4",
       video: "assets/work03.mp4",
