@@ -1,6 +1,5 @@
 /* NULL OBJECT — public portfolio settings.
- * Media is supplied by the uploaded null-object-assets.zip in the project root.
- * GitHub Pages will extract that archive into /assets during deployment.
+ * Media files are stored in assets/.
  * Leave unknown social URLs empty; do not put secrets here.
  */
 window.PORTFOLIO = {
@@ -12,6 +11,11 @@ window.PORTFOLIO = {
   audioTitle: "CHYDE — BROKEN AND COLD / PREVIEW",
   artwork: "assets/null-object-cover.png",
   audioPreview: "assets/audio-preview.mp3",
+  audioTracks: [
+    { title: "Chyde — Broken and Cold", src: "assets/audio-preview.mp3" },
+    { title: "SELFISH — братата", src: "assets/audio-bratata-preview.mp3" },
+    { title: "LOVELLACE — FAVORIT", src: "assets/audio-favorit-preview.mp3" }
+  ],
 
   aboutLine1: "NULL",
   aboutLine2: "OBJECT.",

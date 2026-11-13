@@ -1,220 +1,610 @@
-/* Personal portfolio navigation and visual preview. Not an editor. */
-(function(){
-"use strict";
-var data=window.PORTFOLIO||{};
-var pages=["home","about","work","links"];
-var labels={home:"01_HOME",about:"02_ABOUT",work:"03_MY_WORK",links:"04_SOCIALS"};
-var starts={home:0,about:9,work:18,links:27}, duration=35,fps=24;
-var section="home",seconds=0,playing=false,last=0,raf=0,audio=null,toastTimer=0;
-function $(s,root){return (root||document).querySelector(s);}
-function $$(s,root){return Array.from((root||document).querySelectorAll(s));}
-function el(tag,cls,value){var n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=String(value);return n;}
-function set(s,value){var n=$(s);if(n)n.textContent=String(value==null?"":value);}
-function media(u){return typeof u==="string"&&/^(https:\/\/|\.\/|assets\/|media\/)/i.test(u)&&!/[<>"\u0000-\u001f]/.test(u)&& !(window.NULL_OBJECT_MEDIA_READY===false && /^assets\/(?!.*-fallback\.svg$)/.test(u));}
-function ext(u){return typeof u==="string"&&/^https:\/\//i.test(u);}
-function fmt(t){var total=Math.floor(Math.max(t,0)*fps);return "00:00:"+String(Math.floor(total/fps)).padStart(2,"0")+":"+String(total%fps).padStart(2,"0");}
-function notice(message){var n=$("#toast");n.textContent=message;n.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(function(){n.classList.remove("show");},2700);}
-function applyContent(){
-  var brand=String(data.brand||"YOUR NAME").slice(0,70);
-  document.title=brand+" — CREATIVE WORKSPACE";
-  set("#projectBrand",brand);
-  set("#topProjectTitle",brand.toUpperCase()+" / PERSONAL PROJECT");
-  set("#heroOverline",data.kicker||"CREATIVE PORTFOLIO / 2026");
-  var title=$("#heroTitle"),words=brand.trim().split(/\s+/),lastWord=words.length>1?words.pop():"";
-  title.replaceChildren(document.createTextNode(words.join(" ")));
-  if(lastWord)title.append(el("span","",lastWord));
-  title.append(el("i","","®"));
-  set("#heroSubtitle",data.tagline||"A PERSONAL WORLD BUILT FRAME BY FRAME.");
-  set("#cassetteBrand",data.cassetteLabel||brand+" — THE COLLECTION");
-  set("#audioTrackName",data.audioTitle||"YOUR_AUDIO_TRACK.mp3");
-  var cover=media(data.artwork)?data.artwork:"assets/hero-fallback.svg";
-  if(cover){
-    var art=el("div","hero-artwork");
-    art.style.backgroundImage="linear-gradient(#100c17aa,#100c17aa),url("+JSON.stringify(cover)+")";
-    $("#stage-home").prepend(art);
-  }
-  if(media(data.audioPreview)){
-    audio=new Audio(data.audioPreview);
-    audio.preload="metadata";
-    set("#audioSourceLabel","AUDIO FILE ATTACHED • CLICK PLAY");
-    audio.addEventListener("loadedmetadata",function(){
-      var len=Number.isFinite(audio.duration)?Math.min(duration,Math.ceil(audio.duration)):duration;
-      set(".cassette-duration","00:"+String(len).padStart(2,"0"));
-    });
-    audio.addEventListener("error",function(){audio=null;set("#audioSourceLabel","AUDIO NOT AVAILABLE — CHECK THE FILE");pause();});
-    audio.addEventListener("ended",pause);
-  }else set("#audioSourceLabel","NO AUDIO ATTACHED • VISUAL PREVIEW ONLY");
-  set("#aboutParagraph",data.aboutText||"Tell people about yourself here.");
-  var aboutTitle=$("#aboutHeadline");
-  aboutTitle.replaceChildren(document.createTextNode(data.aboutLine1||"MADE OF"),el("br"),el("em","",data.aboutLine2||"IDEAS."));
-  var tags=$(".about-tags");tags.replaceChildren();
-  var tagList=Array.isArray(data.aboutTags)&&data.aboutTags.length?data.aboutTags:["CREATOR","MOTION","EDITOR"];
-  tagList.slice(0,5).forEach(function(item){tags.append(el("span","",String(item).slice(0,24)));});
-  var portrait=media(data.profilePhoto)?data.profilePhoto:"assets/logo-fallback.svg";
-  var img=el("img");img.src=portrait;img.alt="Null Object creator logo";img.loading="lazy";
-  img.onerror=function(){if(!img.src.endsWith("/logo-fallback.svg"))img.src="assets/logo-fallback.svg";};
-  $(".fake-photo").replaceWith(img);
-  drawWork();drawLinks();markAssets();
-}
-function markAssets(){
-  var rows=$$(".asset-tree-row"),arr=[data.artwork,null,data.profilePhoto,data.audioPreview];
-  var projects=Array.isArray(data.projects)?data.projects:[];
-  arr[1]=projects.some(function(p){return media(p.video);})?"assets/video":"";
-  rows.forEach(function(row,i){if(media(arr[i]))row.title="Media configured in site-config.js";});
-}
-function drawWork(){
-  var grid=$("#workGrid"),items=Array.isArray(data.projects)?data.projects.slice(0,3):[];
-  grid.replaceChildren();
-  for(var i=0;i<3;i++){
-    (function(idx){
-      var item=items[idx]||{},btn=el("button","work-card");btn.type="button";btn.dataset.work=String(idx);
-      var art=el("span","work-art");
-      if(media(item.poster)){var img=el("img");img.src=item.poster;img.alt=item.title||"Project";img.loading="lazy";art.append(img);}
-      else{art.append(el("span","work-placeholder-glyph","▷"));art.append(el("span","",item.label||"VIDEO_0"+(idx+1)+".mp4"));}
-      var caption=el("span","work-caption");
-      caption.append(el("b","",item.title||"PROJECT 0"+(idx+1)));
-      caption.append(el("small","",media(item.video)?"WATCH PROJECT ↗":"ADD VIDEO ↗"));
-      btn.append(art,caption);
-      btn.addEventListener("click",function(){openWork(idx);});
-      grid.append(btn);
-    })(i);
-  }
-}
-function drawLinks(){
-  var grid=$("#linksGrid"),links=Array.isArray(data.socialLinks)&&data.socialLinks.length?data.socialLinks.slice(0,9):[
-    {title:"DISCORD",url:""},{title:"TIKTOK",url:""},{title:"YOUTUBE",url:""},
-    {title:"TELEGRAM",url:""},{title:"INSTAGRAM",url:""},{title:"PERSONAL SITE",url:""}
+(() => {
+  "use strict";
+
+  const config = window.PORTFOLIO || {};
+  const duration = 35;
+  const fps = 24;
+  const routes = [
+    { id: "home", label: "Главная", source: "creative_tape.mp3", type: "Audio", start: 0, color: "#e66c4b" },
+    { id: "about", label: "О проекте", source: "null_object.aep", type: "Comp", start: 9, color: "#d5ab55" },
+    { id: "work", label: "Эдиты", source: "showreel.mp4", type: "Footage", start: 18, color: "#5980d4" },
+    { id: "links", label: "Ссылки", source: "social_links", type: "Links", start: 27, color: "#62a78d" }
   ];
-  grid.replaceChildren();
-  links.forEach(function(item){
-    var ok=ext(item.url),node=el(ok?"a":"button","social-card");
-    node.append(el("strong","",String(item.title||"SOCIAL").slice(0,26)));
-    node.append(el("span","",ok?"↗":"+ ADD"));
-    if(ok){node.href=item.url;node.target="_blank";node.rel="noopener noreferrer";}
-    else{node.type="button";node.title="Add a URL in site-config.js";node.addEventListener("click",function(){notice("ADD THE "+String(item.title||"SOCIAL").toUpperCase()+" LINK IN site-config.js");});}
-    grid.append(node);
-  });
-  set(".links-note",links.some(function(i){return ext(i.url);})?"FOLLOW THE LINKS TO CONNECT. EMPTY SLOTS ARE PLACEHOLDERS.":"ALL LINKS ARE PLACEHOLDERS — ADD YOUR SOCIAL URLS.");
-}
-function openWork(idx){
-  var item=(Array.isArray(data.projects)?data.projects:[])[idx]||{},body=$("#videoDialogBody"),dlg=$("#videoDialog");
-  set("#videoDialogTitle",item.title||"PROJECT 0"+(idx+1));
-  body.replaceChildren();
-  if(media(item.video)){
-    var video=el("video");video.controls=true;video.playsInline=true;video.preload="metadata";video.src=item.video;video.setAttribute("aria-label",item.title||"Project");
-    if(media(item.poster))video.poster=item.poster;body.append(video);
-  }else{
-    var empty=el("div","empty-video");
-    empty.append(el("span","","▷"),el("strong","",item.label||"VIDEO_0"+(idx+1)+".mp4"),
-      el("p","","Video placeholder. Add the MP4 link for this project in site-config.js to play it here."));
-    body.append(empty);
+
+  const $ = id => document.getElementById(id);
+  const editor = document.querySelector(".editor");
+  const viewer = $("viewer");
+  const timelineSeek = $("timelineSeek");
+  const trackColumn = $("trackColumn");
+  const timelinePlay = $("timelinePlay");
+  const fileMenu = $("fileMenu");
+  const mute = $("mute");
+  const volume = $("volume");
+  const audio = new Audio();
+  const audioToggle = $("audioToggle");
+  const audioTrack = $("audioTrack");
+  const audioPosition = $("audioPosition");
+  const audioMessage = $("audioMessage");
+  const video = $("workVideo");
+  const videoMessage = $("videoMessage");
+  const gallery = $("workGallery");
+  const workPlayer = $("workPlayer");
+
+  let selectedRoute;
+  let seconds = 0;
+  let playing = false;
+  let frame = 0;
+  let previewStart = 0;
+  let previewOffset = 0;
+  let audioRequest = 0;
+  let videoRequest = 0;
+  let activeCard;
+
+  function element(tag, className, label) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (label !== undefined) node.textContent = label;
+    return node;
   }
-  if(!dlg.open)dlg.showModal();
-}
-function closeWork(){var dlg=$("#videoDialog"),video=$("video",dlg);if(video)video.pause();if(dlg.open)dlg.close();}
-function drawRuler(){
-  var ruler=$("#timeRuler");ruler.replaceChildren();
-  for(var s=0;s<=duration;s+=5){
-    var t=el("span","ruler-tick","00:"+String(s).padStart(2,"0"));t.style.left=s/duration*100+"%";ruler.append(t);
-    if(s<duration)for(var n=1;n<5;n++){var minor=el("span","ruler-minor");minor.style.left=(s+n)/duration*100+"%";ruler.append(minor);}
+
+  function decorative(tag, className, label) {
+    const node = element(tag, className, label);
+    node.setAttribute("aria-hidden", "true");
+    return node;
   }
-}
-function clock(){set("#timecode",fmt(seconds));set("#currentTimeViewer",fmt(seconds));$("#timelinePlayhead").style.left=seconds/duration*100+"%";}
-function setTime(v,fromRuler){
-  seconds=Math.max(0,Math.min(duration,v));clock();
-  if(fromRuler)goTo(seconds<9?"home":seconds<18?"about":seconds<27?"work":"links",false);
-}
-function goTo(page,jump){
-  if(!pages.includes(page))return;
-  section=page;
-  $$(".stage-page").forEach(function(n){n.classList.toggle("active",n.dataset.page===page);});
-  $$("[data-route]").forEach(function(n){
-    n.classList.toggle("selected",n.classList.contains("tree-item")&&n.dataset.route===page);
-    n.classList.toggle("active",(n.classList.contains("layer-nav")||n.classList.contains("timeline-track"))&&n.dataset.route===page);
-    if(n.classList.contains("layer-nav"))n.setAttribute("aria-current",n.dataset.route===page?"page":"false");
-  });
-  ["#compositionTitle","#crumbLabel","#inspectorComp","#timelineComp"].forEach(function(s){set(s,labels[page]);});
-  if(jump!==false){pause();setTime(starts[page],false);}
-  if(location.hash!=="#"+page)history.replaceState(null,"","#"+page);
-}
-function updateButtons(){
-  set("#togglePreview",playing?"❚❚":"▶");
-  set("#heroPlay",playing?"❚❚":"▶");
-  $("#heroPlay").setAttribute("aria-label",playing?"Pause tape preview":"Start tape preview");
-  $("#cassetteShell").classList.toggle("is-playing",playing);
-}
-function pause(){
-  playing=false;cancelAnimationFrame(raf);last=0;
-  if(audio)audio.pause();updateButtons();
-}
-function renderTick(timestamp){
-  if(!playing)return;
-  if(last)seconds+=Math.min(.09,(timestamp-last)/1000);
-  last=timestamp;
-  if(seconds>=duration){pause();seconds=0;}
-  clock();
-  if(playing)raf=requestAnimationFrame(renderTick);
-}
-function togglePreview(){
-  if(playing){pause();return;}
-  if(section!=="home")goTo("home");
-  if(seconds>=duration)seconds=0;
-  playing=true;last=0;
-  if(audio){
-    try{
-      if(Number.isFinite(audio.duration))audio.currentTime=Math.min(seconds,audio.duration);else audio.currentTime=seconds;
-      var p=audio.play();
-      if(p&&p.catch)p.catch(function(){notice("AUDIO COULD NOT PLAY. SHOWING VISUAL PREVIEW.");});
-    }catch(e){notice("AUDIO UNAVAILABLE. VISUAL PREVIEW ONLY.");}
-  }else notice("VISUAL DEMO ONLY • ADD AN MP3 TO ENABLE AUDIO");
-  updateButtons();raf=requestAnimationFrame(renderTick);
-}
-function closeMenu(){$("#menuDropdown").classList.add("hidden");$$(".menu-btn").forEach(function(b){b.classList.remove("open");});}
-function installMenus(){
-  var menu=$("#menuDropdown");
-  $("#appMenus").addEventListener("click",function(event){
-    var b=event.target.closest("[data-menu]");if(!b)return;
-    if(!menu.classList.contains("hidden")&&b.classList.contains("open")){closeMenu();return;}
-    $$(".menu-btn").forEach(function(x){x.classList.toggle("open",x===b);});
-    menu.replaceChildren();
-    pages.forEach(function(page,i){
-      var row=el("button");row.type="button";
-      row.append(document.createTextNode(String(i+1).padStart(2,"0")+" / "+labels[page]),el("small","",String(i+1)));
-      row.addEventListener("click",function(){goTo(page);closeMenu();});menu.append(row);
-    });
-    if(b.dataset.menu==="help"){
-      var item=el("button","", "Keyboard: 1–4 navigate / Space preview");
-      item.addEventListener("click",function(){notice("1–4 NAVIGATE • SPACE PREVIEW • ESC CLOSE");closeMenu();});menu.append(item);
+
+  function button(className, label) {
+    const node = element("button", className, label);
+    node.type = "button";
+    return node;
+  }
+
+  function mediaSource(value) {
+    return typeof value === "string" && /^(https:\/\/|\.\/|assets\/|media\/)/i.test(value) &&
+      !/[<>"\u0000-\u001f]/.test(value);
+  }
+
+  function externalUrl(value) {
+    if (typeof value !== "string") return "";
+    try {
+      const url = new URL(value);
+      return url.protocol === "https:" ? url.href : "";
+    } catch {
+      return "";
     }
-    menu.style.left=Math.max(0,Math.min(b.getBoundingClientRect().left,innerWidth-235))+"px";
-    menu.classList.remove("hidden");
+  }
+
+  function externalLink(className, title, url) {
+    const link = element("a", className);
+    link.href = url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    if (title) link.textContent = title;
+    return link;
+  }
+
+  function loadImage(image, source, fallback) {
+    if (!mediaSource(source)) return;
+    image.addEventListener("error", () => { image.src = fallback; }, { once: true });
+    image.src = source;
+  }
+
+  function applyContent() {
+    const brand = String(config.brand || "Null Object").trim();
+    const words = brand.split(/\s+/);
+    document.title = brand + " — Creative Archive";
+    document.querySelectorAll("[data-brand]").forEach(node => { node.textContent = brand; });
+    const title = document.querySelector(".home-copy .display-title");
+    title.replaceChildren();
+    words.forEach((word, index) => {
+      if (index) title.append(" ");
+      title.append(element("span", "", word));
+    });
+
+    const tagline = document.querySelector(".home-copy .slide-label");
+    if (config.kicker) tagline.textContent = config.kicker;
+    if (config.aboutText) $("aboutText").textContent = config.aboutText;
+    if (config.handle) $("socialHandle").textContent = config.handle;
+    document.querySelectorAll("[data-avatar]").forEach(image => {
+      loadImage(image, config.profilePhoto, "assets/logo-fallback.svg");
+    });
+    loadImage($("aboutArtwork"), config.artwork, "assets/hero-fallback.svg");
+  }
+
+  function eyeIcon() {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.classList.add("layer-eye");
+    const path = document.createElementNS(svg.namespaceURI, "path");
+    path.setAttribute("d", "M12 5C6 5 2 12 2 12s4 7 10 7 10-7 10-7-4-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8z");
+    svg.append(path);
+    return svg;
+  }
+
+  function drawRoutes() {
+    routes.forEach((route, index) => {
+      const length = (routes[index + 1]?.start ?? duration) - route.start;
+      const project = button("project-item");
+      project.append(decorative("span", "layer-swatch"), element("span", "project-label", route.label),
+        element("small", "project-type", route.type));
+
+      const layer = button("layer-item");
+      const switches = decorative("span", "layer-switches");
+      switches.append(element("i"), element("i"));
+      layer.append(eyeIcon(), decorative("span", "layer-swatch"), decorative("span", "layer-number", index + 1),
+        element("span", "layer-name", route.source), switches);
+      layer.title = route.source;
+
+      const track = button("track-item");
+      track.setAttribute("aria-label", route.label);
+      track.title = route.source;
+      track.style.setProperty("--start", percent(route.start));
+      track.style.setProperty("--length", percent(length));
+      track.append(decorative("span", "track-bar"));
+
+      const chip = button("mobile-chip");
+      chip.append(decorative("span", "layer-swatch"), element("span", "", route.label));
+      const segment = element("span", "mobile-segment");
+      segment.style.setProperty("--route-color", route.color);
+      segment.style.setProperty("--length", percent(length));
+      segment.style.flexBasis = percent(length);
+      $("mobileSegments").append(segment);
+
+      const menuLink = element("a", "file-link", route.label);
+      menuLink.href = "#" + route.id;
+      for (const [node, container] of [
+        [project, "projectList"], [layer, "layerList"], [track, "trackList"],
+        [chip, "mobileSections"], [menuLink, "fileLinks"]
+      ]) {
+        node.dataset.route = route.id;
+        node.style.setProperty("--route-color", route.color);
+        $(container).append(node);
+      }
+    });
+
+    for (let tick = 0; tick < duration; tick += 5) {
+      const mark = element("span", "ruler-tick", String(tick).padStart(2, "0") + "s");
+      mark.style.left = percent(tick);
+      $("timeRuler").append(mark);
+    }
+  }
+
+  function drawWork() {
+    const projects = Array.isArray(config.projects) ? config.projects : [];
+    projects.filter(project => project && mediaSource(project.video)).forEach((project, index) => {
+      const title = project.title || project.label || "Эдит " + (index + 1);
+      const card = button("work-card");
+      card.setAttribute("aria-label", "Смотреть " + title);
+      const image = element("img");
+      image.src = "assets/hero-fallback.svg";
+      image.alt = "";
+      image.loading = "lazy";
+      loadImage(image, project.poster, "assets/hero-fallback.svg");
+      card.append(image, decorative("span", "work-play", "▶"), element("span", "work-title", title));
+      card.addEventListener("click", () => { openWork(project, title, card); });
+      $("workGrid").append(card);
+    });
+    if (!$("workGrid").children.length) {
+      $("workGrid").append(element("p", "media-message", "Пока нет доступных видео."));
+    }
+  }
+
+  function drawLinks() {
+    const links = Array.isArray(config.socialLinks) ? config.socialLinks : [];
+    const tones = ["#e58e51", "#e2bb5e", "#78a2e7", "#78bfa3"];
+    let count = 0;
+    links.forEach(item => {
+      const url = externalUrl(item?.url);
+      if (!url) return;
+      const title = String(item.title || new URL(url).hostname);
+      const link = externalLink("social-link", "", url);
+      link.style.setProperty("--link-color", tones[count % tones.length]);
+      link.append(element("strong", "social-label", title), decorative("span", "social-arrow", "↗"));
+      $("socialStack").append(link);
+
+      const host = new URL(url).hostname.toLowerCase();
+      const footerTitle = {
+        "t.me": "Telegram", "github.com": "GitHub", "null-object-ae.onrender.com": "Сайт"
+      }[host] || title;
+      $("footerLinks").append(externalLink("footer-link", footerTitle, url));
+
+      if (host === "t.me") {
+        $("aboutTelegram").href = url;
+        $("aboutTelegram").hidden = false;
+      }
+      count++;
+    });
+  }
+
+  function percent(time) {
+    return time / duration * 100 + "%";
+  }
+
+  function timecode(time) {
+    const totalFrames = Math.floor(time * fps + 0.000001);
+    const totalSeconds = Math.floor(totalFrames / fps);
+    return [0, Math.floor(totalSeconds / 60), totalSeconds % 60, totalFrames % fps]
+      .map((part, index) => index ? String(part).padStart(2, "0") : part).join(":");
+  }
+
+  function setHash(id, historyMode) {
+    const hash = "#" + id;
+    if (location.hash === hash) return;
+    if (historyMode === "push") history.pushState(null, "", hash);
+    else history.replaceState(null, "", hash);
+  }
+
+  function showRoute(route, historyMode) {
+    if (selectedRoute === route) {
+      setHash(route.id, historyMode);
+      return;
+    }
+
+    if (selectedRoute?.id === "home") stopAudio();
+    if (selectedRoute?.id === "work") closeWork(false);
+    selectedRoute = route;
+
+    routes.forEach(item => {
+      $("stage-" + item.id).hidden = item !== route;
+    });
+    document.querySelectorAll("[data-route]").forEach(control => {
+      const active = control.dataset.route === route.id;
+      if (control.closest(".slide")) return;
+      control.classList.toggle("is-active", active);
+      if (active) control.setAttribute("aria-current", "page");
+      else control.removeAttribute("aria-current");
+    });
+
+    const index = routes.indexOf(route);
+    const chip = $("mobileSections").children[index];
+    if (chip.offsetWidth) {
+      $("mobileSections").scrollLeft = chip.offsetLeft - $("mobileSections").offsetLeft -
+        ($("mobileSections").clientWidth - chip.offsetWidth) / 2;
+    }
+    $("mobileActive").style.setProperty("--route-color", route.color);
+
+    $("compositionSource").textContent = route.source;
+    setHash(route.id, historyMode);
+  }
+
+  function setTime(time, historyMode = "replace") {
+    seconds = Math.max(0, Math.min(duration, time));
+    const label = timecode(seconds);
+    $("timecode").value = label;
+    $("viewerClock").textContent = label;
+    timelineSeek.value = seconds;
+    timelineSeek.setAttribute("aria-valuetext", label);
+    trackColumn.style.setProperty("--playhead", percent(seconds));
+    const route = routes.findLast(item => seconds >= item.start);
+    showRoute(route, historyMode);
+  }
+
+  function seek(time) {
+    pausePreview();
+    setTime(time);
+  }
+
+  function navigate(route, historyMode = "push") {
+    pausePreview();
+    setTime(route.start, historyMode);
+  }
+
+  function step(direction) {
+    const index = routes.indexOf(selectedRoute);
+    navigate(routes[(index + direction + routes.length) % routes.length]);
+  }
+
+  function updatePreview() {
+    timelinePlay.firstElementChild.textContent = playing ? "❚❚" : "▶";
+    timelinePlay.setAttribute("aria-label", playing ? "Приостановить таймлайн" : "Воспроизвести таймлайн");
+    timelinePlay.setAttribute("aria-pressed", String(playing));
+    $("menuPreview").setAttribute("aria-pressed", String(playing));
+    editor.classList.toggle("is-playing", playing);
+    $("playState").textContent = playing ? "Playing" : "Paused";
+  }
+
+  function pausePreview() {
+    if (!playing) return;
+    playing = false;
+    cancelAnimationFrame(frame);
+    updatePreview();
+  }
+
+  function advancePreview(now) {
+    if (!playing) return;
+    setTime(previewOffset + (now - previewStart) / 1000);
+    if (seconds >= duration) pausePreview();
+    else frame = requestAnimationFrame(advancePreview);
+  }
+
+  function togglePreview() {
+    if (playing) {
+      pausePreview();
+      return;
+    }
+    stopAudio();
+    closeWork(false);
+    if (seconds >= duration) setTime(0);
+    previewStart = performance.now();
+    previewOffset = seconds;
+    playing = true;
+    updatePreview();
+    frame = requestAnimationFrame(advancePreview);
+  }
+
+  function showAudioState() {
+    const active = !audio.paused && !audio.ended;
+    audioToggle.replaceChildren(decorative("span", "", active ? "❚❚" : "▶"),
+      document.createTextNode(active ? " Пауза" : " Слушать"));
+    audioToggle.setAttribute("aria-pressed", String(active));
+    $("stage-home").classList.toggle("is-playing-audio", active);
+  }
+
+  function showAudioPosition() {
+    audioPosition.value = audio.currentTime;
+    audioPosition.style.setProperty("--fill",
+      Number.isFinite(audio.duration) && audio.duration > 0 ? (audio.currentTime / audio.duration * 100) + "%" : "0%");
+  }
+
+  function stopAudio() {
+    audioRequest++;
+    audio.pause();
+    showAudioState();
+  }
+
+  function reportAudioError() {
+    audioPosition.disabled = true;
+    audioMessage.textContent = "Не удалось загрузить аудио. Попробуй выбрать другой трек.";
+    showAudioState();
+  }
+
+  function applyAudioTrack(tracks) {
+    stopAudio();
+    audioMessage.textContent = "";
+    audioPosition.disabled = true;
+    audioPosition.value = "0";
+    audioPosition.style.setProperty("--fill", "0%");
+    audio.src = tracks[Number(audioTrack.value)].src;
+    audio.load();
+  }
+
+  async function toggleAudio() {
+    if (!audio.paused) {
+      stopAudio();
+      return;
+    }
+    pausePreview();
+    closeWork(false);
+    const request = ++audioRequest;
+    audioMessage.textContent = "";
+    if (audio.ended) audio.currentTime = 0;
+    try {
+      await audio.play();
+    } catch (error) {
+      if (request !== audioRequest) return;
+      if (error.name === "NotAllowedError") audioMessage.textContent = "Нажми «Слушать» ещё раз.";
+      else reportAudioError();
+    }
+  }
+
+  function setVolume(nextVolume, muted = false) {
+    const value = Math.max(0, Math.min(1, nextVolume));
+    audio.volume = video.volume = value;
+    audio.muted = video.muted = muted;
+    volume.value = value;
+    volume.style.setProperty("--fill", (muted ? 0 : value * 100) + "%");
+    const silent = muted || value === 0;
+    mute.setAttribute("aria-label", silent ? "Включить звук" : "Выключить звук");
+    mute.setAttribute("aria-pressed", String(silent));
+  }
+
+  function configureAudio() {
+    const configured = Array.isArray(config.audioTracks) ? config.audioTracks : [];
+    const tracks = configured.filter(track => track && mediaSource(track.src));
+    if (!tracks.length && mediaSource(config.audioPreview)) {
+      tracks.push({ title: config.audioTitle || "Аудиопревью", src: config.audioPreview });
+    }
+    if (!tracks.length) {
+      audioTrack.disabled = audioToggle.disabled = audioPosition.disabled = true;
+      audioTrack.append(element("option", "", "Нет аудио"));
+      return;
+    }
+    tracks.forEach((track, index) => {
+      const option = element("option", "", track.title || "Трек " + (index + 1));
+      option.value = index;
+      audioTrack.append(option);
+    });
+
+    audio.preload = "metadata";
+    audio.addEventListener("loadedmetadata", () => {
+      audioPosition.max = audio.duration;
+      audioPosition.disabled = !Number.isFinite(audio.duration) || audio.duration <= 0;
+      showAudioPosition();
+    });
+    ["play", "pause", "ended"].forEach(event => audio.addEventListener(event, showAudioState));
+    audio.addEventListener("timeupdate", showAudioPosition);
+    audio.addEventListener("error", reportAudioError);
+    audioTrack.addEventListener("change", () => { applyAudioTrack(tracks); });
+    audioToggle.addEventListener("click", toggleAudio);
+    audioPosition.addEventListener("input", () => {
+      audio.currentTime = Number(audioPosition.value);
+      showAudioPosition();
+    });
+    applyAudioTrack(tracks);
+  }
+
+  async function openWork(project, title, card) {
+    pausePreview();
+    stopAudio();
+    activeCard = card;
+    const request = ++videoRequest;
+    $("videoTitle").textContent = title;
+    video.setAttribute("aria-label", title);
+    videoMessage.textContent = "";
+    video.poster = mediaSource(project.poster) ? project.poster : "";
+    video.src = project.video;
+    gallery.hidden = true;
+    workPlayer.hidden = false;
+    $("backToWorks").focus();
+    try {
+      await video.play();
+    } catch (error) {
+      if (request !== videoRequest) return;
+      videoMessage.textContent = error.name === "NotAllowedError" ?
+        "Нажми кнопку воспроизведения в плеере." : "Не удалось воспроизвести видео.";
+    }
+  }
+
+  function closeWork(restoreFocus) {
+    if (workPlayer.hidden) return;
+    videoRequest++;
+    video.pause();
+    video.removeAttribute("src");
+    video.load();
+    workPlayer.hidden = true;
+    gallery.hidden = false;
+    if (restoreFocus) activeCard?.focus();
+    activeCard = null;
+  }
+
+  function bindTimeline() {
+    let dragPointer;
+    const seekAtPointer = event => {
+      const bounds = trackColumn.getBoundingClientRect();
+      seek((event.clientX - bounds.left) / bounds.width * duration);
+    };
+
+    trackColumn.addEventListener("pointerdown", event => {
+      if (event.button !== 0 || event.target.closest(".track-bar")) return;
+      event.preventDefault();
+      timelineSeek.focus({ preventScroll: true });
+      dragPointer = event.pointerId;
+      trackColumn.setPointerCapture(dragPointer);
+      seekAtPointer(event);
+    });
+    trackColumn.addEventListener("pointermove", event => {
+      if (event.pointerId === dragPointer) seekAtPointer(event);
+    });
+    trackColumn.addEventListener("lostpointercapture", () => { dragPointer = undefined; });
+    timelineSeek.addEventListener("input", () => { seek(Number(timelineSeek.value)); });
+  }
+
+  function bindPreviewNavigation() {
+    let wheelDistance = 0;
+    let lastWheel = 0;
+    $("viewArea").addEventListener("wheel", event => {
+      if (!event.cancelable || event.ctrlKey || event.target.closest("video,select,input")) return;
+      event.preventDefault();
+      const now = performance.now();
+      if (now - lastWheel > 180) wheelDistance = 0;
+      lastWheel = now;
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      wheelDistance += delta * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? 80 : 1);
+      if (Math.abs(wheelDistance) >= 60) {
+        step(Math.sign(wheelDistance));
+        wheelDistance = 0;
+      }
+    }, { passive: false });
+
+    let touchStart;
+    viewer.addEventListener("touchstart", event => {
+      if (event.touches.length !== 1 || event.target.closest("video,select,input,button,a")) return;
+      const { clientX, clientY } = event.touches[0];
+      touchStart = { x: clientX, y: clientY };
+    }, { passive: true });
+    viewer.addEventListener("touchend", event => {
+      if (!touchStart) return;
+      const { clientX, clientY } = event.changedTouches[0];
+      const deltaX = clientX - touchStart.x;
+      const deltaY = clientY - touchStart.y;
+      if (Math.abs(deltaX) >= 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+        step(deltaX < 0 ? 1 : -1);
+      }
+      touchStart = undefined;
+    }, { passive: true });
+    viewer.addEventListener("touchcancel", () => { touchStart = undefined; }, { passive: true });
+  }
+
+  function routeFromHash() {
+    return routes.find(route => location.hash === "#" + route.id);
+  }
+
+  function handleKeys(event) {
+    if (event.key === "Escape") {
+      if (fileMenu.open) {
+        fileMenu.open = false;
+        fileMenu.querySelector("summary").focus();
+      } else if (!workPlayer.hidden) {
+        closeWork(true);
+      }
+      return;
+    }
+    if (event.altKey || event.ctrlKey || event.metaKey ||
+      event.target.closest("input,select,textarea,video,[contenteditable]")) return;
+
+    if (event.code === "Space" && !event.target.closest("button,a,summary")) {
+      event.preventDefault();
+      if (!event.repeat) togglePreview();
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      const direction = event.key === "ArrowRight" ? 1 : -1;
+      if (event.shiftKey) step(direction);
+      else seek(seconds + direction / fps);
+    } else if (/^[1-4]$/.test(event.key) && !event.repeat) {
+      navigate(routes[Number(event.key) - 1]);
+    }
+  }
+
+  applyContent();
+  drawRoutes();
+  drawWork();
+  drawLinks();
+  configureAudio();
+  setVolume(Number(volume.value));
+  setTime((routeFromHash() || routes[0]).start);
+  bindTimeline();
+  bindPreviewNavigation();
+
+  document.addEventListener("click", event => {
+    const control = event.target.closest("[data-route]");
+    if (control) {
+      event.preventDefault();
+      navigate(routes.find(route => route.id === control.dataset.route));
+      if (fileMenu.open) fileMenu.querySelector("summary").focus();
+      fileMenu.open = false;
+      return;
+    }
+    const stepControl = event.target.closest("[data-step]");
+    if (stepControl) step(Number(stepControl.dataset.step));
+    if (!fileMenu.contains(event.target)) fileMenu.open = false;
   });
-  document.addEventListener("pointerdown",function(e){if(!e.target.closest(".app-menubar"))closeMenu();});
-}
-function init(){
-  applyContent();drawRuler();
-  $$("[data-route]").forEach(function(n){n.addEventListener("click",function(){goTo(n.dataset.route);});});
-  $("#heroPlay").addEventListener("click",togglePreview);
-  $("#togglePreview").addEventListener("click",togglePreview);
-  $("#restartPreview").addEventListener("click",function(){pause();goTo("home");setTime(0);});
-  $("#timeRuler").addEventListener("click",function(e){
-    var rect=this.getBoundingClientRect();pause();setTime((e.clientX-rect.left)/rect.width*duration,true);
+
+  document.addEventListener("keydown", handleKeys);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) return;
+    pausePreview();
+    stopAudio();
+    video.pause();
   });
-  $("#closeVideoDialog").addEventListener("click",closeWork);
-  $("#videoDialog").addEventListener("click",function(e){if(e.target===this)closeWork();});
-  $("#videoDialog").addEventListener("close",function(){var v=$("video",this);if(v)v.pause();});
-  installMenus();
-  document.addEventListener("keydown",function(e){
-    if(e.target.matches("input,textarea,[contenteditable]"))return;
-    if(e.key==="Escape"){closeWork();closeMenu();return;}
-    if($("#videoDialog").open)return;
-    if(["1","2","3","4"].includes(e.key)&&!e.altKey&&!e.ctrlKey&&!e.metaKey)goTo(pages[Number(e.key)-1]);
-    if(e.code==="Space"&&!e.repeat&&!e.altKey&&!e.ctrlKey&&!e.metaKey){e.preventDefault();togglePreview();}
+  window.addEventListener("hashchange", () => {
+    navigate(routeFromHash() || routes[0], "replace");
   });
-  document.addEventListener("visibilitychange",function(){if(document.hidden)pause();});
-  window.addEventListener("hashchange",function(){var p=location.hash.slice(1);if(pages.includes(p))goTo(p);});
-  var first=location.hash.slice(1);
-  goTo(pages.includes(first)?first:"home");
-}
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init);else init();
+
+  $("toggleGuides").addEventListener("click", event => {
+    const guide = $("safeGuide");
+    guide.hidden = !guide.hidden;
+    event.currentTarget.setAttribute("aria-pressed", String(!guide.hidden));
+  });
+  timelinePlay.addEventListener("click", togglePreview);
+  $("menuPreview").addEventListener("click", togglePreview);
+  $("backToWorks").addEventListener("click", () => { closeWork(true); });
+  video.addEventListener("error", () => {
+    if (!workPlayer.hidden) videoMessage.textContent = "Не удалось загрузить видео.";
+  });
+  volume.addEventListener("input", () => { setVolume(Number(volume.value)); });
+  mute.addEventListener("click", () => {
+    const muted = audio.muted || audio.volume === 0;
+    setVolume(audio.volume || 0.8, !muted);
+  });
 })();

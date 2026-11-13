@@ -28,18 +28,9 @@ jobs:
           node --check site-config.js
       - name: Assemble website
         run: |
-          mkdir -p _site/assets
+          mkdir -p _site
           cp index.html styles.css app.js site-config.js favicon.svg _site/
-          cp assets/*.svg _site/assets/
-          if [ -f null-object-assets.zip ]; then
-            echo "Found optional user media bundle."
-            unzip -oq null-object-assets.zip 'assets/*' -d _site
-            echo 'window.NULL_OBJECT_MEDIA_READY = true;' > _site/media-status.js
-          else
-            cp media-status.js _site/
-            echo "No media bundle uploaded yet; showing SVG and visual placeholders."
-          fi
-          find _site -maxdepth 2 -type f -printf '%p\n'
+          cp -R assets _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
