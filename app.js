@@ -287,34 +287,34 @@
 
   function drawLinks() {
     const links = Array.isArray(config.socialLinks) ? config.socialLinks : [];
-    const tones = ["#e58e51", "#e2bb5e", "#78a2e7", "#78bfa3"];
-    let count = 0;
     links.forEach(item => {
       const url = externalUrl(item?.url);
+      if (!url && item?.comingSoon) {
+        const card = element("div", "social-link social-unavailable");
+        card.append(element("strong", "social-label", item.title),
+          localizedElement("span", "social-status", "socialComingSoon"));
+        $("socialStack").append(card);
+        return;
+      }
       if (!url) return;
       const host = new URL(url).hostname.toLowerCase();
       const title = String(item.title || host);
-      const titleKey = item.titleKey || {
-        "t.me": "socialTelegram", "github.com": "socialGithub", "null-object-ae.onrender.com": "socialSite"
-      }[host];
+      const titleKey = item.titleKey || (host === "t.me" ? "socialTelegram" : "");
       const link = externalLink("social-link", "", url);
-      link.style.setProperty("--link-color", tones[count % tones.length]);
       const label = element("strong", "social-label", title);
       if (titleKey) label.dataset.i18n = titleKey;
       link.append(label, decorative("span", "social-arrow", "↗"));
       $("socialStack").append(link);
 
-      const footerTitle = { "t.me": "Telegram", "github.com": "GitHub" }[host] || title;
-      const footerKey = item.footerKey || (host === "null-object-ae.onrender.com" ? "footerSite" : "");
+      const footerTitle = host === "t.me" ? "Telegram" : title;
       const footer = externalLink("footer-link", footerTitle, url);
-      if (footerKey) footer.dataset.i18n = footerKey;
+      if (item.footerKey) footer.dataset.i18n = item.footerKey;
       $("footerLinks").append(footer);
 
       if (host === "t.me") {
         $("aboutTelegram").href = url;
         $("aboutTelegram").hidden = false;
       }
-      count++;
     });
   }
 

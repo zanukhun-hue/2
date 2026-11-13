@@ -169,8 +169,10 @@ body::after { content: ""; position: fixed; z-index: 90; inset: 0; pointer-event
 .social-link { display: flex; align-items: center; justify-content: space-between; gap: 9px; min-height: clamp(34px, 7cqw, 76px); padding: 0 11%; background: #2d2932; color: #fffaf2; font-size: clamp(11px, 2.3cqw, 25px); font-weight: 700; box-shadow: 0 9px 15px #37232538; transform: rotate(-3deg); transition: transform .18s ease; }
 .social-link:nth-child(2) { background: #52416b; transform: rotate(2deg); }
 .social-link:nth-child(3) { background: #a93f37; transform: rotate(-1.5deg); }
-.social-link:hover, .social-link:focus-visible { transform: translateX(-4px); }
-.social-link span:last-child { font-size: .8em; font-weight: 500; }
+.social-link:not(.social-unavailable):hover, .social-link:not(.social-unavailable):focus-visible { transform: translateX(-4px); }
+.social-arrow { font-size: .8em; font-weight: 500; }
+.social-link.social-unavailable { justify-content: flex-start; color: #ebe9f5; background: #48435b; box-shadow: 0 5px 10px #37232526; transform: rotate(1deg); }
+.social-unavailable .social-status { flex: 0 0 auto; margin-left: auto; color: #ded7ee; font: 500 clamp(9px, 1.35cqw, 13px)/1.15 var(--sans); text-align: right; }
 
 .slide.is-entering .display-title {
   animation: heading-reveal 690ms var(--ease-out) 90ms backwards;
@@ -318,6 +320,8 @@ input[type="range"]::-moz-range-thumb { width: 11px; height: 11px; border: 0; bo
   .video-toggle { width: 54px; }
   .social-stack { width: 100%; max-width: 420px; }
   .social-link { min-height: 50px; font-size: 16px; }
+  .social-link.social-unavailable { padding-inline: clamp(12px, 7cqw, 28px); }
+  .social-unavailable .social-status { font-size: 11px; }
   .timeline { display: flex; flex-direction: column; gap: 6px; padding: 9px 10px max(9px, env(safe-area-inset-bottom)); border-top: 1px solid #3c3a40; background: #18181b; }
   .mobile-sections { display: flex; gap: 6px; overflow-x: auto; padding: 3px 2px; scrollbar-width: none; }
   .mobile-chip { display: flex; gap: 7px; align-items: center; flex: 0 0 auto; min-height: 34px; padding: 0 10px; border-radius: 20px; background: #303035; color: var(--paper); font-size: 12px; font-weight: 700; white-space: nowrap; }

@@ -40,11 +40,10 @@ window.PORTFOLIO = {
 
   socialLinks: [
     { title: "TELEGRAM CHANNEL", url: "https://t.me/ae_plugins_vault" },
-    { title: "DISCORD", url: "" },
+    { title: "Discord", comingSoon: true },
     { title: "TIKTOK", url: "" },
     { title: "YOUTUBE", url: "" },
-    { title: "GITHUB", url: "https://github.com/zanukhun-hue" },
-    { title: "MAIN SITE", url: "https://null-object-ae.onrender.com" }
+    { title: "Website", url: "https://null-object-ae.netlify.app/", titleKey: "socialSite", footerKey: "footerSite" }
   ]
 };
 
@@ -89,7 +88,7 @@ window.PORTFOLIO_LOCALES = {
     videoPlayError: "Could not play this video.",
     videoLoadError: "Could not load this video.",
     socialTelegram: "Telegram Channel",
-    socialGithub: "GitHub",
+    socialComingSoon: "Coming soon",
     socialSite: "Website",
     footerSite: "Website",
     mastheadTag: "After Effects · Edits · Motion Design",
@@ -166,7 +165,7 @@ window.PORTFOLIO_LOCALES = {
     videoPlayError: "Не удалось воспроизвести видео.",
     videoLoadError: "Не удалось загрузить видео.",
     socialTelegram: "Канал в Telegram",
-    socialGithub: "GitHub",
+    socialComingSoon: "Скоро",
     socialSite: "Основной сайт",
     footerSite: "Сайт",
     mastheadTag: "After Effects · Эдиты · Моушн-дизайн",
