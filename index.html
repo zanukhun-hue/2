@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#101012">
-  <meta name="description" content="Null Object — плагины After Effects, эдиты и моушн-дизайн.">
+  <meta name="description" content="Null Object — After Effects plugins, edits, and motion design." data-i18n-content="description">
   <title>Null Object — Creative Archive</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,121 +16,125 @@
 </head>
 <body>
   <header class="masthead">
-    <div><p><span class="brand-star" aria-hidden="true">✦</span> After Effects · Edits · Motion Design</p><h1 data-brand>Null Object</h1></div>
-    <div class="masthead-note"><span>CREATIVE ARCHIVE <strong>00:00:35</strong></span><span>Листай композицию или перетащи плейхед</span></div>
+    <div><p><span class="brand-star" aria-hidden="true">✦</span> <span data-i18n="mastheadTag">After Effects · Edits · Motion Design</span></p><h1 data-brand>Null Object</h1></div>
+    <div class="masthead-note"><span><span data-i18n="archiveUpper">CREATIVE ARCHIVE</span> <strong>00:00:35</strong></span><span data-i18n="mastheadHint">Scroll the composition or drag the playhead</span></div>
   </header>
 
-  <main class="editor" aria-label="Портфолио Null Object">
+  <main class="editor" aria-label="Null Object portfolio" data-i18n-aria="editor">
     <header class="menubar">
       <span class="ae-mark" aria-hidden="true">Ae</span>
       <div class="desktop-menu">
-        <details class="file-menu" id="fileMenu"><summary>File</summary><nav id="fileLinks" aria-label="Разделы проекта"></nav></details>
-        <button type="button" id="toggleGuides" aria-pressed="true" title="Показать или скрыть направляющие">Composition</button>
-        <button type="button" id="menuPreview" aria-pressed="false" title="Воспроизвести таймлайн">Preview</button>
+        <details class="file-menu" id="fileMenu"><summary data-i18n="file">File</summary><nav id="fileLinks" aria-label="Project sections" data-i18n-aria="projectSections"></nav></details>
+        <button type="button" id="toggleGuides" aria-pressed="true" title="Toggle guides" data-i18n-title="guides" data-i18n="composition">Composition</button>
+        <button type="button" id="menuPreview" aria-pressed="false" title="Play the timeline" data-i18n-title="playTimeline" data-i18n="preview">Preview</button>
       </div>
       <span class="file-name">Null_Object.aep</span>
-      <div class="mobile-brand"><strong data-brand>Null Object</strong><span>CREATIVE ARCHIVE</span></div>
+      <div class="mobile-brand"><strong data-brand>Null Object</strong><span data-i18n="archiveUpper">CREATIVE ARCHIVE</span></div>
       <img class="menu-avatar" data-avatar src="assets/logo-fallback.svg" alt="" width="22" height="22">
+      <div class="language-switch" id="languageSwitch" role="group" aria-label="Language" data-i18n-aria="language">
+        <button type="button" data-language="en" lang="en" aria-label="English" aria-pressed="true">EN</button>
+        <button type="button" data-language="ru" lang="ru" aria-label="Русский" aria-pressed="false">RU</button>
+      </div>
       <span class="mobile-active" id="mobileActive" aria-hidden="true"></span>
     </header>
 
     <div class="workspace">
-      <aside class="project-panel" aria-label="Project">
-        <div class="panel-tab"><span>Project</span></div>
+      <aside class="project-panel" aria-label="Project" data-i18n-aria="project">
+        <div class="panel-tab"><span data-i18n="project">Project</span></div>
         <div class="project-summary">
           <img data-avatar src="assets/logo-fallback.svg" width="65" height="65" alt="">
-          <div><strong data-brand>Null Object</strong><span>Creative archive</span><span>1920 × 1080</span><span>24 fps · 4 layers</span></div>
+          <div><strong data-brand>Null Object</strong><span data-i18n="archive">Creative archive</span><span>1920 × 1080</span><span data-i18n="projectStats">24 fps · 4 layers</span></div>
         </div>
-        <nav class="project-list" id="projectList" aria-label="Разделы портфолио"></nav>
+        <nav class="project-list" id="projectList" aria-label="Portfolio sections" data-i18n-aria="portfolioSections"></nav>
       </aside>
 
-      <section class="composition-panel" aria-label="Composition">
-        <div class="panel-tab"><span>Composition: Creative_Archive</span><small id="compositionSource">creative_tape.mp3</small></div>
+      <section class="composition-panel" aria-label="Composition" data-i18n-aria="composition">
+        <div class="panel-tab"><span data-i18n="compositionName">Composition: Creative_Archive</span><small id="compositionSource">creative_tape.mp3</small></div>
         <div class="view-area" id="viewArea">
           <div class="viewer" id="viewer">
-            <section class="slide home-slide" id="stage-home" aria-label="Главная">
-              <div class="cover-frame"><img data-avatar src="assets/logo-fallback.svg" alt="Маскот Null Object на терракотовой обложке" width="1024" height="1024"></div>
+            <section class="slide home-slide" id="stage-home" aria-label="Home" data-i18n-aria="home">
+              <div class="cover-frame"><img data-avatar src="assets/logo-fallback.svg" alt="The Null Object mascot on a terracotta print" data-i18n-alt="avatarAlt" width="1024" height="1024"></div>
               <div class="home-copy">
-                <p class="slide-label">AFTER EFFECTS / PLUGINS / EDITS</p>
+                <p class="slide-label" data-i18n="kicker">AFTER EFFECTS / PLUGINS / CREATIVE WORK</p>
                 <h2 class="display-title"><span>Null</span> <span>Object</span></h2>
                 <div class="audio-controls">
-                  <input id="audioPosition" class="audio-position" type="range" min="0" max="35" value="0" step="0.1" aria-label="Позиция аудио">
+                  <input id="audioPosition" class="audio-position" type="range" min="0" max="35" value="0" step="0.1" aria-label="Audio position" data-i18n-aria="audioPosition">
                   <div class="actions">
-                    <button type="button" class="primary-button" id="audioToggle"><span aria-hidden="true">▶</span> Слушать</button>
-                    <button type="button" class="outline-button" data-route="work">Эдиты <span aria-hidden="true">↗</span></button>
+                    <button type="button" class="primary-button" id="audioToggle"><span aria-hidden="true">▶</span> Listen</button>
+                    <button type="button" class="outline-button" data-route="work"><span data-i18n="work">Edits</span> <span aria-hidden="true">↗</span></button>
                   </div>
-                  <label class="track-picker"><span aria-hidden="true">♫</span><select id="audioTrack" aria-label="Трек"></select></label>
+                  <label class="track-picker"><span aria-hidden="true">♫</span><select id="audioTrack" aria-label="Track" data-i18n-aria="track"></select></label>
                   <p class="media-message" id="audioMessage" role="status"></p>
                 </div>
               </div>
             </section>
 
-            <section class="slide about-slide" id="stage-about" aria-label="О проекте" hidden>
+            <section class="slide about-slide" id="stage-about" aria-label="About" data-i18n-aria="about" hidden>
               <div class="about-copy">
-                <p class="slide-label">NULL OBJECT / ABOUT</p>
-                <h2 class="display-title">О проекте</h2>
-                <p id="aboutText">Null Object — проект про плагины Adobe After Effects, эдиты и моушн-дизайн.</p>
+                <p class="slide-label" data-i18n="aboutLabel">NULL OBJECT / ABOUT</p>
+                <h2 class="display-title" data-i18n="about">About</h2>
+                <p id="aboutText" data-i18n="aboutText">Null Object is a project about After Effects plugins, edits, and motion design. I share tools, effects, and visual experiments for editors and motion designers.</p>
                 <a class="outline-button" id="aboutTelegram" target="_blank" rel="noopener noreferrer" hidden>Telegram <span aria-hidden="true">↗</span></a>
               </div>
-              <img id="aboutArtwork" src="assets/hero-fallback.svg" alt="Маскот Null Object в движении среди ключевых кадров" width="1200" height="800">
+              <img id="aboutArtwork" src="assets/hero-fallback.svg" alt="The Null Object mascot in motion among keyframes" data-i18n-alt="aboutAlt" width="1200" height="800">
             </section>
 
-            <section class="slide work-slide" id="stage-work" aria-label="Эдиты" hidden>
+            <section class="slide work-slide" id="stage-work" aria-label="Edits" data-i18n-aria="work" hidden>
               <div class="work-gallery" id="workGallery">
-                <h2 class="display-title">Эдиты</h2>
+                <h2 class="display-title" data-i18n="work">Edits</h2>
                 <div class="work-grid" id="workGrid"></div>
               </div>
               <div class="work-player" id="workPlayer" hidden>
-                <div class="player-bar"><button type="button" id="backToWorks">‹ Все эдиты</button><span id="videoTitle"></span></div>
+                <div class="player-bar"><button type="button" id="backToWorks" data-i18n="backToWorks">‹ All edits</button><span id="videoTitle"></span></div>
                 <video id="workVideo" playsinline controls preload="none"></video>
                 <p class="media-message" id="videoMessage" role="status"></p>
               </div>
             </section>
 
-            <section class="slide socials-slide" id="stage-links" aria-label="Ссылки" hidden>
-              <div class="social-copy"><p class="slide-label" id="socialHandle">@ae_plugins_vault</p><h2 class="display-title">Ссылки</h2></div>
+            <section class="slide socials-slide" id="stage-links" aria-label="Links" data-i18n-aria="links" hidden>
+              <div class="social-copy"><p class="slide-label" id="socialHandle">@ae_plugins_vault</p><h2 class="display-title" data-i18n="links">Links</h2></div>
               <div class="social-stack" id="socialStack"></div>
             </section>
             <div class="safe-guide" id="safeGuide" aria-hidden="true"></div>
           </div>
-          <button type="button" class="view-arrow previous" data-step="-1" aria-label="Предыдущий раздел"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
-          <button type="button" class="view-arrow next" data-step="1" aria-label="Следующий раздел"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+          <button type="button" class="view-arrow previous" data-step="-1" aria-label="Previous section" data-i18n-aria="previous"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 6-6 6 6 6"/></svg></button>
+          <button type="button" class="view-arrow next" data-step="1" aria-label="Next section" data-i18n-aria="next"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
         </div>
-        <div class="viewer-footer"><span>(Full)</span><span class="viewer-clock" id="viewerClock">0:00:00:00</span><span id="playState">Paused</span></div>
+        <div class="viewer-footer"><span data-i18n="full">(Full)</span><span class="viewer-clock" id="viewerClock">0:00:00:00</span><span id="playState">Paused</span></div>
       </section>
     </div>
 
-    <section class="timeline" aria-label="Таймлайн">
-      <nav class="mobile-sections" id="mobileSections" aria-label="Разделы портфолио"></nav>
+    <section class="timeline" aria-label="Timeline" data-i18n-aria="timeline">
+      <nav class="mobile-sections" id="mobileSections" aria-label="Portfolio sections" data-i18n-aria="portfolioSections"></nav>
       <div class="transport">
         <output id="timecode" class="timecode">0:00:00:00</output>
         <div class="transport-buttons">
-          <button type="button" data-step="-1" aria-label="Предыдущий раздел"><span aria-hidden="true">|◂</span></button>
-          <button type="button" id="timelinePlay" class="timeline-play" aria-label="Воспроизвести таймлайн" aria-pressed="false"><span aria-hidden="true">▶</span></button>
-          <button type="button" data-step="1" aria-label="Следующий раздел"><span aria-hidden="true">▸|</span></button>
-          <button type="button" id="mute" aria-label="Выключить звук" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="sound-wave" d="M16 9a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"/><path class="muted-cross" d="m16 10 5 5m0-5-5 5"/></svg></button>
-          <input id="volume" type="range" min="0" max="1" value="0.8" step="0.01" aria-label="Громкость">
+          <button type="button" data-step="-1" aria-label="Previous section" data-i18n-aria="previous"><span aria-hidden="true">|◂</span></button>
+          <button type="button" id="timelinePlay" class="timeline-play" aria-label="Play the timeline" aria-pressed="false"><span aria-hidden="true">▶</span></button>
+          <button type="button" data-step="1" aria-label="Next section" data-i18n-aria="next"><span aria-hidden="true">▸|</span></button>
+          <button type="button" id="mute" aria-label="Mute" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="sound-wave" d="M16 9a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"/><path class="muted-cross" d="m16 10 5 5m0-5-5 5"/></svg></button>
+          <input id="volume" type="range" min="0" max="1" value="0.8" step="0.01" aria-label="Volume" data-i18n-aria="volume">
         </div>
-        <p class="keyboard-hint"><kbd>Space</kbd> воспроизведение · <kbd>← →</kbd> перемотка · <kbd>1–4</kbd> разделы</p>
+        <p class="keyboard-hint"><kbd>Space</kbd> <span data-i18n="keyPlay">play</span> · <kbd>← →</kbd> <span data-i18n="keyScrub">scrub</span> · <kbd>1–4</kbd> <span data-i18n="keySections">sections</span></p>
       </div>
       <div class="timeline-grid">
-        <div class="layer-column"><div class="layer-header"># &nbsp; Layer Name</div><nav id="layerList" aria-label="Слои таймлайна"></nav></div>
+        <div class="layer-column"><div class="layer-header"># &nbsp; <span data-i18n="layerName">Layer Name</span></div><nav id="layerList" aria-label="Timeline layers" data-i18n-aria="timelineLayers"></nav></div>
         <div class="track-column" id="trackColumn">
           <div class="ruler" id="timeRuler" aria-hidden="true"></div>
           <div class="track-list" id="trackList"></div>
           <div class="mobile-segments" id="mobileSegments" aria-hidden="true"></div>
-          <input id="timelineSeek" type="range" min="0" max="35" step="0.05" value="0" aria-label="Позиция на таймлайне">
+          <input id="timelineSeek" type="range" min="0" max="35" step="0.05" value="0" aria-label="Timeline position" data-i18n-aria="timelinePosition">
           <div class="playhead" aria-hidden="true"></div>
         </div>
       </div>
     </section>
 
     <footer class="editor-footer">
-      <span class="footer-brand"><span class="brand-star" aria-hidden="true">✦</span> CREATIVE ARCHIVE <span class="brand-star" aria-hidden="true">✦</span></span>
+      <span class="footer-brand"><span class="brand-star" aria-hidden="true">✦</span> <span data-i18n="archiveUpper">CREATIVE ARCHIVE</span> <span class="brand-star" aria-hidden="true">✦</span></span>
       <span class="copyright">© 2026 <span data-brand>Null Object</span></span>
-      <nav id="footerLinks" aria-label="Социальные ссылки"></nav>
+      <nav id="footerLinks" aria-label="Social links" data-i18n-aria="socialLinks"></nav>
     </footer>
   </main>
-  <noscript>Включи JavaScript, чтобы переключать композиции и смотреть эдиты.</noscript>
+  <noscript>Enable JavaScript to switch compositions and watch the edits.</noscript>
 </body>
 </html>

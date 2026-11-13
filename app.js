@@ -2,13 +2,15 @@
   "use strict";
 
   const config = window.PORTFOLIO || {};
+  const locales = window.PORTFOLIO_LOCALES || {};
+  const languageStorageKey = "null-object-language";
   const duration = 35;
   const fps = 24;
   const routes = [
-    { id: "home", label: "Главная", source: "creative_tape.mp3", type: "Audio", start: 0, color: "#e66c4b" },
-    { id: "about", label: "О проекте", source: "null_object.aep", type: "Comp", start: 9, color: "#d5ab55" },
-    { id: "work", label: "Эдиты", source: "showreel.mp4", type: "Footage", start: 18, color: "#5980d4" },
-    { id: "links", label: "Ссылки", source: "social_links", type: "Links", start: 27, color: "#62a78d" }
+    { id: "home", source: "creative_tape.mp3", type: "typeAudio", start: 0, color: "#e66c4b" },
+    { id: "about", source: "null_object.aep", type: "typeComp", start: 9, color: "#d5ab55" },
+    { id: "work", source: "showreel.mp4", type: "typeFootage", start: 18, color: "#5980d4" },
+    { id: "links", source: "social_links", type: "typeLinks", start: 27, color: "#62a78d" }
   ];
 
   const $ = id => document.getElementById(id);
@@ -22,6 +24,9 @@
   const volume = $("volume");
   const audio = new Audio();
   const audioToggle = $("audioToggle");
+  const audioIcon = audioToggle.firstElementChild;
+  const audioLabel = document.createTextNode("");
+  audioToggle.replaceChildren(audioIcon, audioLabel);
   const audioTrack = $("audioTrack");
   const audioPosition = $("audioPosition");
   const audioMessage = $("audioMessage");
@@ -29,7 +34,11 @@
   const videoMessage = $("videoMessage");
   const gallery = $("workGallery");
   const workPlayer = $("workPlayer");
+  const languageSwitch = $("languageSwitch");
+  const localizeMedia = [];
 
+  let language = savedLanguage();
+  let brand = "Null Object";
   let selectedRoute;
   let seconds = 0;
   let playing = false;
@@ -39,6 +48,56 @@
   let audioRequest = 0;
   let videoRequest = 0;
   let activeCard;
+
+  function savedLanguage() {
+    try {
+      if (localStorage.getItem(languageStorageKey) === "ru") return "ru";
+    } catch {
+      // The language switch remains available when storage is blocked.
+    }
+    return "en";
+  }
+
+  function translate(key, values = {}) {
+    const text = locales[language]?.[key] ?? locales.en?.[key];
+    return text?.replace(/\{(\w+)\}/g, (token, name) => values[name] ?? token);
+  }
+
+  function localizedElement(tag, className, key) {
+    const node = element(tag, className);
+    node.dataset.i18n = key;
+    return node;
+  }
+
+  function setMessage(node, key = "") {
+    if (key) node.dataset.i18n = key;
+    else delete node.dataset.i18n;
+    node.textContent = translate(key) || "";
+  }
+
+  function applyLanguage() {
+    document.documentElement.lang = language;
+    document.title = brand + " — " + (translate("titleSuffix") || "Creative Archive");
+    const attributes = [
+      ["data-i18n", ""], ["data-i18n-aria", "aria-label"], ["data-i18n-title", "title"],
+      ["data-i18n-alt", "alt"], ["data-i18n-content", "content"]
+    ];
+    for (const [source, target] of attributes) {
+      document.querySelectorAll("[" + source + "]").forEach(node => {
+        const text = translate(node.getAttribute(source));
+        if (text === undefined) return;
+        if (target) node.setAttribute(target, text);
+        else if (node.textContent !== text) node.textContent = text;
+      });
+    }
+    localizeMedia.forEach(update => update());
+    languageSwitch?.querySelectorAll("[data-language]").forEach(control => {
+      control.setAttribute("aria-pressed", String(control.dataset.language === language));
+    });
+    updatePreview();
+    showAudioState();
+    updateMuteLabel();
+  }
 
   function element(tag, className, label) {
     const node = document.createElement(tag);
@@ -90,9 +149,8 @@
   }
 
   function applyContent() {
-    const brand = String(config.brand || "Null Object").trim();
+    brand = String(config.brand || "Null Object").trim();
     const words = brand.split(/\s+/);
-    document.title = brand + " — Creative Archive";
     document.querySelectorAll("[data-brand]").forEach(node => { node.textContent = brand; });
     const title = document.querySelector(".home-copy .display-title");
     title.replaceChildren();
@@ -101,9 +159,6 @@
       title.append(element("span", "", word));
     });
 
-    const tagline = document.querySelector(".home-copy .slide-label");
-    if (config.kicker) tagline.textContent = config.kicker;
-    if (config.aboutText) $("aboutText").textContent = config.aboutText;
     if (config.handle) $("socialHandle").textContent = config.handle;
     document.querySelectorAll("[data-avatar]").forEach(image => {
       loadImage(image, config.profilePhoto, "assets/logo-fallback.svg");
@@ -126,8 +181,8 @@
     routes.forEach((route, index) => {
       const length = (routes[index + 1]?.start ?? duration) - route.start;
       const project = button("project-item");
-      project.append(decorative("span", "layer-swatch"), element("span", "project-label", route.label),
-        element("small", "project-type", route.type));
+      project.append(decorative("span", "layer-swatch"), localizedElement("span", "project-label", route.id),
+        localizedElement("small", "project-type", route.type));
 
       const layer = button("layer-item");
       const switches = decorative("span", "layer-switches");
@@ -137,21 +192,21 @@
       layer.title = route.source;
 
       const track = button("track-item");
-      track.setAttribute("aria-label", route.label);
+      track.dataset.i18nAria = route.id;
       track.title = route.source;
       track.style.setProperty("--start", percent(route.start));
       track.style.setProperty("--length", percent(length));
       track.append(decorative("span", "track-bar"));
 
       const chip = button("mobile-chip");
-      chip.append(decorative("span", "layer-swatch"), element("span", "", route.label));
+      chip.append(decorative("span", "layer-swatch"), localizedElement("span", "", route.id));
       const segment = element("span", "mobile-segment");
       segment.style.setProperty("--route-color", route.color);
       segment.style.setProperty("--length", percent(length));
       segment.style.flexBasis = percent(length);
       $("mobileSegments").append(segment);
 
-      const menuLink = element("a", "file-link", route.label);
+      const menuLink = localizedElement("a", "file-link", route.id);
       menuLink.href = "#" + route.id;
       for (const [node, container] of [
         [project, "projectList"], [layer, "layerList"], [track, "trackList"],
@@ -173,20 +228,25 @@
   function drawWork() {
     const projects = Array.isArray(config.projects) ? config.projects : [];
     projects.filter(project => project && mediaSource(project.video)).forEach((project, index) => {
-      const title = project.title || project.label || "Эдит " + (index + 1);
       const card = button("work-card");
-      card.setAttribute("aria-label", "Смотреть " + title);
+      const title = element("span", "work-title");
       const image = element("img");
       image.src = "assets/hero-fallback.svg";
       image.alt = "";
       image.loading = "lazy";
       loadImage(image, project.poster, "assets/hero-fallback.svg");
-      card.append(image, decorative("span", "work-play", "▶"), element("span", "work-title", title));
-      card.addEventListener("click", () => { openWork(project, title, card); });
+      card.append(image, decorative("span", "work-play", "▶"), title);
+      card.addEventListener("click", () => { openWork(project, title.textContent, card); });
+      localizeMedia.push(() => {
+        const name = project.title || project.label || translate("workFallback", { number: index + 1 });
+        title.textContent = name;
+        card.setAttribute("aria-label", translate("watchWork", { title: name }) || name);
+        if (activeCard === card) showVideoTitle(name);
+      });
       $("workGrid").append(card);
     });
     if (!$("workGrid").children.length) {
-      $("workGrid").append(element("p", "media-message", "Пока нет доступных видео."));
+      $("workGrid").append(localizedElement("p", "media-message", "noWorks"));
     }
   }
 
@@ -197,17 +257,23 @@
     links.forEach(item => {
       const url = externalUrl(item?.url);
       if (!url) return;
-      const title = String(item.title || new URL(url).hostname);
+      const host = new URL(url).hostname.toLowerCase();
+      const title = String(item.title || host);
+      const titleKey = item.titleKey || {
+        "t.me": "socialTelegram", "github.com": "socialGithub", "null-object-ae.onrender.com": "socialSite"
+      }[host];
       const link = externalLink("social-link", "", url);
       link.style.setProperty("--link-color", tones[count % tones.length]);
-      link.append(element("strong", "social-label", title), decorative("span", "social-arrow", "↗"));
+      const label = element("strong", "social-label", title);
+      if (titleKey) label.dataset.i18n = titleKey;
+      link.append(label, decorative("span", "social-arrow", "↗"));
       $("socialStack").append(link);
 
-      const host = new URL(url).hostname.toLowerCase();
-      const footerTitle = {
-        "t.me": "Telegram", "github.com": "GitHub", "null-object-ae.onrender.com": "Сайт"
-      }[host] || title;
-      $("footerLinks").append(externalLink("footer-link", footerTitle, url));
+      const footerTitle = { "t.me": "Telegram", "github.com": "GitHub" }[host] || title;
+      const footerKey = item.footerKey || (host === "null-object-ae.onrender.com" ? "footerSite" : "");
+      const footer = externalLink("footer-link", footerTitle, url);
+      if (footerKey) footer.dataset.i18n = footerKey;
+      $("footerLinks").append(footer);
 
       if (host === "t.me") {
         $("aboutTelegram").href = url;
@@ -297,11 +363,14 @@
 
   function updatePreview() {
     timelinePlay.firstElementChild.textContent = playing ? "❚❚" : "▶";
-    timelinePlay.setAttribute("aria-label", playing ? "Приостановить таймлайн" : "Воспроизвести таймлайн");
+    const action = translate(playing ? "pauseTimeline" : "playTimeline");
+    timelinePlay.setAttribute("aria-label", action);
     timelinePlay.setAttribute("aria-pressed", String(playing));
-    $("menuPreview").setAttribute("aria-pressed", String(playing));
+    const menuPreview = $("menuPreview");
+    menuPreview.setAttribute("aria-pressed", String(playing));
+    menuPreview.title = action;
     editor.classList.toggle("is-playing", playing);
-    $("playState").textContent = playing ? "Playing" : "Paused";
+    $("playState").textContent = translate(playing ? "playing" : "paused");
   }
 
   function pausePreview() {
@@ -335,8 +404,8 @@
 
   function showAudioState() {
     const active = !audio.paused && !audio.ended;
-    audioToggle.replaceChildren(decorative("span", "", active ? "❚❚" : "▶"),
-      document.createTextNode(active ? " Пауза" : " Слушать"));
+    audioIcon.textContent = active ? "❚❚" : "▶";
+    audioLabel.data = translate(active ? "pauseAudio" : "listen") || "";
     audioToggle.setAttribute("aria-pressed", String(active));
     $("stage-home").classList.toggle("is-playing-audio", active);
   }
@@ -355,13 +424,13 @@
 
   function reportAudioError() {
     audioPosition.disabled = true;
-    audioMessage.textContent = "Не удалось загрузить аудио. Попробуй выбрать другой трек.";
+    setMessage(audioMessage, "audioError");
     showAudioState();
   }
 
   function applyAudioTrack(tracks) {
     stopAudio();
-    audioMessage.textContent = "";
+    setMessage(audioMessage);
     audioPosition.disabled = true;
     audioPosition.value = "0";
     audioPosition.style.setProperty("--fill", "0%");
@@ -377,13 +446,13 @@
     pausePreview();
     closeWork(false);
     const request = ++audioRequest;
-    audioMessage.textContent = "";
+    setMessage(audioMessage);
     if (audio.ended) audio.currentTime = 0;
     try {
       await audio.play();
     } catch (error) {
       if (request !== audioRequest) return;
-      if (error.name === "NotAllowedError") audioMessage.textContent = "Нажми «Слушать» ещё раз.";
+      if (error.name === "NotAllowedError") setMessage(audioMessage, "audioBlocked");
       else reportAudioError();
     }
   }
@@ -394,8 +463,12 @@
     audio.muted = video.muted = muted;
     volume.value = value;
     volume.style.setProperty("--fill", (muted ? 0 : value * 100) + "%");
-    const silent = muted || value === 0;
-    mute.setAttribute("aria-label", silent ? "Включить звук" : "Выключить звук");
+    updateMuteLabel();
+  }
+
+  function updateMuteLabel() {
+    const silent = audio.muted || audio.volume === 0;
+    mute.setAttribute("aria-label", translate(silent ? "unmute" : "mute"));
     mute.setAttribute("aria-pressed", String(silent));
   }
 
@@ -403,16 +476,21 @@
     const configured = Array.isArray(config.audioTracks) ? config.audioTracks : [];
     const tracks = configured.filter(track => track && mediaSource(track.src));
     if (!tracks.length && mediaSource(config.audioPreview)) {
-      tracks.push({ title: config.audioTitle || "Аудиопревью", src: config.audioPreview });
+      tracks.push({ title: config.audioTitle, fallback: "audioPreview", src: config.audioPreview });
     }
     if (!tracks.length) {
       audioTrack.disabled = audioToggle.disabled = audioPosition.disabled = true;
-      audioTrack.append(element("option", "", "Нет аудио"));
+      audioTrack.append(localizedElement("option", "", "noAudio"));
       return;
     }
     tracks.forEach((track, index) => {
-      const option = element("option", "", track.title || "Трек " + (index + 1));
+      const option = element("option", "", track.title);
       option.value = index;
+      if (!track.title) {
+        localizeMedia.push(() => {
+          option.textContent = translate(track.fallback || "trackFallback", { number: index + 1 });
+        });
+      }
       audioTrack.append(option);
     });
 
@@ -439,9 +517,8 @@
     stopAudio();
     activeCard = card;
     const request = ++videoRequest;
-    $("videoTitle").textContent = title;
-    video.setAttribute("aria-label", title);
-    videoMessage.textContent = "";
+    showVideoTitle(title);
+    setMessage(videoMessage);
     video.poster = mediaSource(project.poster) ? project.poster : "";
     video.src = project.video;
     gallery.hidden = true;
@@ -451,9 +528,13 @@
       await video.play();
     } catch (error) {
       if (request !== videoRequest) return;
-      videoMessage.textContent = error.name === "NotAllowedError" ?
-        "Нажми кнопку воспроизведения в плеере." : "Не удалось воспроизвести видео.";
+      setMessage(videoMessage, error.name === "NotAllowedError" ? "videoBlocked" : "videoPlayError");
     }
+  }
+
+  function showVideoTitle(title) {
+    $("videoTitle").textContent = title;
+    video.setAttribute("aria-label", title);
   }
 
   function closeWork(restoreFocus) {
@@ -565,9 +646,22 @@
   drawLinks();
   configureAudio();
   setVolume(Number(volume.value));
+  applyLanguage();
   setTime((routeFromHash() || routes[0]).start);
   bindTimeline();
   bindPreviewNavigation();
+
+  languageSwitch?.addEventListener("click", event => {
+    const nextLanguage = event.target.closest("[data-language]")?.dataset.language;
+    if (!Object.hasOwn(locales, nextLanguage) || nextLanguage === language) return;
+    language = nextLanguage;
+    try {
+      localStorage.setItem(languageStorageKey, language);
+    } catch {
+      // The current tab keeps the selected language without storage.
+    }
+    applyLanguage();
+  });
 
   document.addEventListener("click", event => {
     const control = event.target.closest("[data-route]");
@@ -609,7 +703,7 @@
   $("menuPreview").addEventListener("click", togglePreview);
   $("backToWorks").addEventListener("click", () => { closeWork(true); });
   video.addEventListener("error", () => {
-    if (!workPlayer.hidden) videoMessage.textContent = "Не удалось загрузить видео.";
+    if (!workPlayer.hidden) setMessage(videoMessage, "videoLoadError");
   });
   volume.addEventListener("input", () => { setVolume(Number(volume.value)); });
   mute.addEventListener("click", () => {
