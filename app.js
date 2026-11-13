@@ -493,10 +493,12 @@
   function bindPreviewNavigation() {
     let wheelDistance = 0;
     let lastWheel = 0;
+    let wheelLockedUntil = 0;
     $("viewArea").addEventListener("wheel", event => {
       if (!event.cancelable || event.ctrlKey || event.target.closest("video,select,input")) return;
       event.preventDefault();
       const now = performance.now();
+      if (now < wheelLockedUntil) return;
       if (now - lastWheel > 180) wheelDistance = 0;
       lastWheel = now;
       const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
@@ -504,6 +506,7 @@
       if (Math.abs(wheelDistance) >= 60) {
         step(Math.sign(wheelDistance));
         wheelDistance = 0;
+        wheelLockedUntil = now + 280;
       }
     }, { passive: false });
 
@@ -570,7 +573,13 @@
     const control = event.target.closest("[data-route]");
     if (control) {
       event.preventDefault();
-      navigate(routes.find(route => route.id === control.dataset.route));
+      const route = routes.find(item => item.id === control.dataset.route);
+      navigate(route);
+      if (control.closest(".slide")) {
+        const heading = $("stage-" + route.id).querySelector("h2");
+        heading.tabIndex = -1;
+        heading.focus({ preventScroll: true });
+      }
       if (fileMenu.open) fileMenu.querySelector("summary").focus();
       fileMenu.open = false;
       return;
